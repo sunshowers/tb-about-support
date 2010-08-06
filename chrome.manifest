@@ -1,3 +1,4 @@
 content about-support content/
 locale about-support en-US locales/en-US/
+skin about-support classic/1.0 skin/
 overlay chrome://messenger/content/messenger.xul chrome://about-support/content/overlay.xul
