@@ -40,10 +40,12 @@
 
 <overlay id="tb-about-support-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
+  <script type="application/x-javascript" src="chrome://about-support/content/messengerOverlay.js" />
   <menupopup id="menu_HelpPopup">
     <menuitem label="&helpTroubleshootingInfo.label;"
               accesskey="&helpTroubleshootingInfo.accesskey;"
-              insertafter="menu_openHelp" />
+              insertafter="menu_openHelp"
+              oncommand="AboutSupport.openInNewTab();" />
   </menupopup>
 
 </overlay>

@@ -99,21 +99,19 @@ window.onload = function () {
 }
 
 function populateExtensionsSection() {
-  Application.getExtensions(function (extensions) {
-    let all = extensions.all;
-    let trExtensions = [];
-    for (let i = 0; i < all.length; i++) {
-      let extension = all[i];
-      let tr = createParentElement("tr", [
-        createElement("td", extension.name),
-        createElement("td", extension.version),
-        createElement("td", extension.enabled),
-        createElement("td", extension.id),
-      ]);
-      trExtensions.push(tr);
-    }
-    appendChildren(document.getElementById("extensions-tbody"), trExtensions);
-  });
+  let extensions = Application.extensions.all;
+  let trExtensions = [];
+  for (let i = 0; i < extensions.length; i++) {
+    let extension = extensions[i];
+    let tr = createParentElement("tr", [
+      createElement("td", extension.name),
+      createElement("td", extension.version),
+      createElement("td", extension.enabled),
+      createElement("td", extension.id),
+    ]);
+    trExtensions.push(tr);
+  }
+  appendChildren(document.getElementById("extensions-tbody"), trExtensions);
 }
 
 function populatePreferencesSection() {
@@ -168,7 +166,7 @@ function getModifiedPrefs() {
 function getWhitelistedPrefNames() {
   let results = [];
   PREFS_WHITELIST.forEach(function (prefStem) {
-    let prefNames = gPrefService.getChildList(prefStem);
+    let prefNames = gPrefService.getChildList(prefStem, {});
     results = results.concat(prefNames);
   });
   return results;
