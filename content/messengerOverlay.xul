@@ -36,7 +36,7 @@
   - 
   -  ***** END LICENSE BLOCK ***** -->
 
-<!DOCTYPE overlay SYSTEM "chrome://about-support/locale/helpMenuOverlay.dtd">
+<!DOCTYPE overlay SYSTEM "chrome://about-support/locale/messengerOverlay.dtd">
 
 <overlay id="tb-about-support-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
