@@ -41,7 +41,9 @@
 <overlay id="tb-about-support-overlay"
          xmlns="http://www.mozilla.org/keymaster/gatekeeper/there.is.only.xul">
   <menupopup id="menu_HelpPopup">
-    <menuitem label="&helpTroubleshootingInfo.label;" />
+    <menuitem label="&helpTroubleshootingInfo.label;"
+              accesskey="&helpTroubleshootingInfo.accesskey;"
+              insertafter="menu_openHelp" />
   </menupopup>
 
 </overlay>
