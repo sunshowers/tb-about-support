@@ -1,0 +1,3 @@
+content about-support content/
+locale about-support en-US locales/en-US/
+overlay chrome://messenger/content/messenger.xul chrome://about-support/content/overlay.xul
