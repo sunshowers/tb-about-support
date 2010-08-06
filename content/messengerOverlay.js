@@ -39,6 +39,7 @@ var AboutSupport = {
   openInNewTab: function aboutSupport_openInNewTab() {
     let tabmail = document.getElementById("tabmail");
     tabmail.openTab("contentTab",
-                    {contentPage: "chrome://about-support/content/aboutSupport.xhtml"});
+                    {contentPage: "chrome://about-support/content/aboutSupport.xhtml",
+                     clickHandler: "specialTabs.aboutClickHandler(event);" });
   }
 };
