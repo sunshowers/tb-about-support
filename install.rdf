@@ -5,7 +5,7 @@
 
   <Description about="urn:mozilla:install-manifest">
     <em:id>tbaboutsupport@mozillamessaging.com</em:id>
-    <em:name>Thunderbird about:support</em:name>
+    <em:name>about:support</em:name>
     <em:version>0.1</em:version>
 
     <em:description>A Mozilla Messaging addon to assist in product support.</em:description>
