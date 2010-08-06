@@ -1,0 +1,4 @@
+<!-- LOCALIZATION NOTE (aboutSupport.show.label): This is the Mac-specific
+variant of the aboutSupport.show.label in aboutSupportDefault.dtd.  This allows
+us to use the preferred "Finder" terminology on Mac. -->
+<!ENTITY aboutSupport.show.label "Show in Finder">
