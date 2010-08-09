@@ -20,6 +20,8 @@
 <!ENTITY aboutSupport.appBasicsEnabledPlugins "Enabled Plugins">
 <!ENTITY aboutSupport.appBasicsBuildConfig "Build Configuration">
 
+<!ENTITY aboutSupport.accountsTitle "Mail and News Accounts">
+
 <!ENTITY aboutSupport.modifiedPrefsTitle "Modified Preferences">
 <!ENTITY aboutSupport.modifiedPrefsName "Name">
 <!ENTITY aboutSupport.modifiedPrefsValue "Value">
