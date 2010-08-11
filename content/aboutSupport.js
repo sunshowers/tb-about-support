@@ -38,6 +38,7 @@
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
+Components.utils.import("resource:///modules/iteratorUtils.jsm");
 
 let gPrefService = Cc["@mozilla.org/preferences-service;1"]
                      .getService(Ci.nsIPrefService)
@@ -95,6 +96,7 @@ window.onload = function () {
 
   // Update the other sections.
   populatePreferencesSection();
+  populateAccountsSection();
   populateExtensionsSection();
 }
 
@@ -112,6 +114,56 @@ function populateExtensionsSection() {
     trExtensions.push(tr);
   }
   appendChildren(document.getElementById("extensions-tbody"), trExtensions);
+}
+
+function populateAccountsSection() {
+  let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
+                         .getService(Ci.nsIMsgAccountManager);
+  let smtpService = Cc["@mozilla.org/messengercompose/smtp;1"]
+                      .getService(Ci.nsISmtpService);
+
+  // Invert nsMsgSocketType and nsMsgAuthMethod so that we can present something
+  // slightly more descriptive than a mere number. JS really should have object
+  // comprehensions :(
+  let socketTypes = {};
+  for each (let [str, index] in Iterator(Ci.nsMsgSocketType))
+    socketTypes[index] = str;
+  let authMethods = {};
+  for each (let [str, index] in Iterator(Ci.nsMsgAuthMethod))
+    authMethods[index] = str;  
+
+  let accounts = accountManager.accounts;
+  let trAccounts = [];
+  for each (account in fixIterator(accounts, Ci.nsIMsgAccount)) {
+    let server = account.incomingServer;
+    let identities = account.identities;
+    let smtpServerNames = [];
+
+    for each (identity in fixIterator(identities, Ci.nsIMsgIdentity)) {
+      let isDefault = identity == account.defaultIdentity;
+      let smtpServer = {};
+      smtpService.GetSmtpServerByIdentity(identity, smtpServer);
+
+      // Just in case the number doesn't correspond to an entry for some reason...
+      let authMethod = authMethods[smtpServer.value.authMethod] ||
+        smtpServer.value.authMethod;
+      let socketType = socketTypes[smtpServer.value.socketType] ||
+        smtpServer.value.socketType;
+      smtpServerNames.push(smtpServer.value.displayname + " (" +
+                           authMethod + "; " + socketType +
+                           (isDefault ? "; default" : "") + ")");
+    }
+
+    let tr = createParentElement("tr", [
+      createElement("td", server.prettyName),
+      createElement("td", "(" + server.type + ") " + server.hostName + ":" + server.port),
+      createElement("td", server.isSecure),
+      createElement("td", server.realUsername),
+      createElement("td", smtpServerNames.join(", "))
+    ]);
+    trAccounts.push(tr);
+  }
+  appendChildren(document.getElementById("accounts-tbody"), trAccounts);
 }
 
 function populatePreferencesSection() {
