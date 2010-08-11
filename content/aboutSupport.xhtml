@@ -169,25 +169,40 @@
 
       <table class="accounts-table">
         <thead>
-          <th>
-            Name
-          </th>
+          <tr>
+            <th rowspan="2">
+              Name
+            </th>
           
-          <th>
-            Incoming server name
-          </th>
+            <th rowspan="2">
+              Incoming server name
+            </th>
 
-          <th>
-            Secure?
-          </th>
+            <th rowspan="2">
+              Secure?
+            </th>
 
-          <th>
-            Username
-          </th>
+            <th colspan="4">
+              Outgoing servers
+            </th>
+          </tr>
+          <tr class="thead-level2">
+            <th class="lolwut">
+              Name
+            </th>
 
-          <th>
-            Outgoing servers
-          </th>
+            <th>
+              Authentication method
+            </th>
+
+            <th>
+              Socket type
+            </th>
+
+            <th>
+              Default?
+            </th>
+          </tr>
         </thead>
 
         <tbody id="accounts-tbody">

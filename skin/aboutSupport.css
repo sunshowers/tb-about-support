@@ -85,6 +85,11 @@ th {
   color: HighlightText;
 }
 
+.thead-level2 > th {
+  background-color: -moz-Dialog;
+  color: -moz-DialogText;
+}
+
 th.column {
   white-space: nowrap;
   width: 0px;

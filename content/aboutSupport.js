@@ -43,6 +43,8 @@ Components.utils.import("resource:///modules/iteratorUtils.jsm");
 let gPrefService = Cc["@mozilla.org/preferences-service;1"]
                      .getService(Ci.nsIPrefService)
                      .QueryInterface(Ci.nsIPrefBranch2);
+let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
+                     .getService(Ci.nsISmtpService);
 
 const ELLIPSIS = gPrefService.getComplexValue("intl.ellipsis",
                                               Ci.nsIPrefLocalizedString).data;
@@ -119,11 +121,33 @@ function populateExtensionsSection() {
   appendChildren(document.getElementById("extensions-tbody"), trExtensions);
 }
 
+/**
+ * Gets details about SMTP servers for a given nsIMsgAccount.
+ *
+ * @returns A list of records, each record containing the name and other details
+ *          about one SMTP server.
+ */
+function getSMTPDetails(aAccount) {
+  let identities = aAccount.identities;
+  let defaultIdentity = aAccount.defaultIdentity;
+  let smtpDetails = [];
+
+  for each (let identity in fixIterator(identities, Ci.nsIMsgIdentity)) {
+    let isDefault = identity == defaultIdentity;
+    let smtpServer = {};
+    gSMTPService.GetSmtpServerByIdentity(identity, smtpServer);
+    smtpDetails.push({name: smtpServer.value.displayname,
+                      authMethod: smtpServer.value.authMethod,
+                      socketType: smtpServer.value.socketType,
+                      isDefault: isDefault});
+  }
+
+  return smtpDetails;
+}
+
 function populateAccountsSection() {
   let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
                          .getService(Ci.nsIMsgAccountManager);
-  let smtpService = Cc["@mozilla.org/messengercompose/smtp;1"]
-                      .getService(Ci.nsISmtpService);
 
   // Invert nsMsgSocketType and nsMsgAuthMethod so that we can present something
   // slightly more descriptive than a mere number. JS really should have object
@@ -133,38 +157,35 @@ function populateAccountsSection() {
     socketTypes[index] = str;
   let authMethods = {};
   for each (let [str, index] in Iterator(Ci.nsMsgAuthMethod))
-    authMethods[index] = str;  
+    authMethods[index] = str;
 
   let accounts = accountManager.accounts;
   let trAccounts = [];
-  for each (account in fixIterator(accounts, Ci.nsIMsgAccount)) {
+  for each (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
     let server = account.incomingServer;
-    let identities = account.identities;
-    let smtpServerNames = [];
+    let smtpDetails = getSMTPDetails(account);
 
-    for each (identity in fixIterator(identities, Ci.nsIMsgIdentity)) {
-      let isDefault = identity == account.defaultIdentity;
-      let smtpServer = {};
-      smtpService.GetSmtpServerByIdentity(identity, smtpServer);
+    let smtpMarkup = [[createElement("td", smtpServer.name),
+                       createElement("td", smtpServer.authMethod),
+                       createElement("td", smtpServer.socketType),
+                       createElement("td", smtpServer.isDefault)]
+                      for each ([, smtpServer] in Iterator(smtpDetails))];
+    // smtpMarkup might not be configured, in which case add one dummy element
+    // to it to appease the HTML gods below.
+    if (smtpMarkup.length == 0)
+      smtpMarkup = [[]];
 
-      // Just in case the number doesn't correspond to an entry for some reason...
-      let authMethod = authMethods[smtpServer.value.authMethod] ||
-        smtpServer.value.authMethod;
-      let socketType = socketTypes[smtpServer.value.socketType] ||
-        smtpServer.value.socketType;
-      smtpServerNames.push(smtpServer.value.displayname + " (" +
-                           authMethod + "; " + socketType +
-                           (isDefault ? "; default" : "") + ")");
-    }
-
+    // Add the first SMTP server to this tr.
     let tr = createParentElement("tr", [
-      createElement("td", server.prettyName),
-      createElement("td", "(" + server.type + ") " + server.hostName + ":" + server.port),
-      createElement("td", server.isSecure),
-      createElement("td", server.realUsername),
-      createElement("td", smtpServerNames.join(", "))
-    ]);
+      createElement("td", server.prettyName, "", {"rowspan": smtpMarkup.length}),
+      createElement("td", "(" + server.type + ") " + server.hostName + ":" + server.port,
+                    "", {"rowspan": smtpMarkup.length}),
+      createElement("td", server.isSecure, "", {"rowspan": smtpMarkup.length}),
+    ].concat(smtpMarkup[0]));
     trAccounts.push(tr);
+    // Add the remaining SMTP servers as separate trs
+    for each (let [, tds] in Iterator(smtpMarkup.slice(1)))
+      trAccounts.push(createParentElement("tr", tds));
   }
   appendChildren(document.getElementById("accounts-tbody"), trAccounts);
 }
@@ -237,10 +258,15 @@ function createParentElement(tagName, childElems) {
   return elem;
 }
 
-function createElement(tagName, textContent, opt_class) {
+function createElement(tagName, textContent, opt_class, opt_attributes) {
+  if (opt_attributes === undefined)
+    opt_attributes = [];
   let elem = document.createElement(tagName);
   elem.textContent = textContent;
   elem.className = opt_class || "";
+  for each (let [key, value] in Iterator(opt_attributes))
+    elem.setAttribute(key, "" + value);
+
   return elem;
 }
 
