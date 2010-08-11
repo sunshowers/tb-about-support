@@ -70,6 +70,8 @@ const PREFS_WHITELIST = [
   "javascript.",
   "keyword.",
   "layout.css.dpi",
+  "mail.spotlight.",
+  "mail.winsearch.",
   "network.",
   "places.",
   "print.",
@@ -81,6 +83,7 @@ const PREFS_WHITELIST = [
 const PREFS_BLACKLIST = [
   /^network[.]proxy[.]/,
   /[.]print_to_filename$/,
+  /[.]lastFolderIndexedUri/,
 ];
 
 window.onload = function () {
