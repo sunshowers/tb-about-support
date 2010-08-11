@@ -156,7 +156,21 @@ function getSMTPDetails(aAccount) {
 let gSocketTypes = {};
 for each (let [str, index] in Iterator(Ci.nsMsgSocketType))
   gSocketTypes[index] = str;
-  
+
+function getPrettySocketType(aIndex) {
+  let prettySocketType;
+  try {
+    prettySocketType = gMessengerBundle.GetStringFromName(
+      "smtpServer-ConnectionSecurityType-" + aIndex) +
+      " (" + (aIndex in gSocketTypes ? gSocketTypes[aIndex] : aIndex) + ")";
+  }
+  catch (e if e.result == Components.results.NS_ERROR_FAILURE) {
+    // The string wasn't found in the bundle. Make do without it.
+    prettySocketType = aIndex in gSocketTypes ? gSocketTypes[aIndex] : aIndex;
+  }
+  return prettySocketType;
+}
+
 let gAuthMethods = {};
 for each (let [str, index] in Iterator(Ci.nsMsgAuthMethod))
   gAuthMethods[index] = str;
@@ -170,7 +184,6 @@ let gAuthMethodProperties = {
   "6": "authNTLM",
   "8": "authAnySecure"
 };
-
 
 function getPrettyAuthMethod(aIndex) {
   let prettyAuthMethod;
@@ -199,7 +212,7 @@ function populateAccountsSection() {
 
     let smtpMarkup = [[createElement("td", smtpServer.name),
                        createElement("td", getPrettyAuthMethod(smtpServer.authMethod)),
-                       createElement("td", smtpServer.socketType),
+                       createElement("td", getPrettySocketType(smtpServer.socketType)),
                        createElement("td", smtpServer.isDefault)]
                       for each ([, smtpServer] in Iterator(smtpDetails))];
     // smtpMarkup might not be configured, in which case add one dummy element
