@@ -211,8 +211,8 @@ function populateAccountsSection() {
     let smtpDetails = getSMTPDetails(account);
 
     let smtpMarkup = [[createElement("td", smtpServer.name),
-                       createElement("td", getPrettyAuthMethod(smtpServer.authMethod)),
                        createElement("td", getPrettySocketType(smtpServer.socketType)),
+                       createElement("td", getPrettyAuthMethod(smtpServer.authMethod)),
                        createElement("td", smtpServer.isDefault)]
                       for each ([, smtpServer] in Iterator(smtpDetails))];
     // smtpMarkup might not be configured, in which case add one dummy element
@@ -223,9 +223,12 @@ function populateAccountsSection() {
     // Add the first SMTP server to this tr.
     let tr = createParentElement("tr", [
       createElement("td", server.prettyName, "", {"rowspan": smtpMarkup.length}),
-      createElement("td", "(" + server.type + ") " + server.hostName + ":" + server.port,
-                    "", {"rowspan": smtpMarkup.length}),
-      createElement("td", server.isSecure, "", {"rowspan": smtpMarkup.length}),
+      createElement("td", "(" + server.type + ") " + server.hostName + ":" +
+                    server.port, "", {"rowspan": smtpMarkup.length}),
+      createElement("td", getPrettySocketType(server.socketType), "",
+                    {"rowspan": smtpMarkup.length}),
+      createElement("td", getPrettyAuthMethod(server.authMethod), "",
+                    {"rowspan": smtpMarkup.length}),
     ].concat(smtpMarkup[0]));
     trAccounts.push(tr);
     // Add the remaining SMTP servers as separate trs
