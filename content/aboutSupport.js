@@ -43,6 +43,11 @@ Components.utils.import("resource:///modules/iteratorUtils.jsm");
 let gPrefService = Cc["@mozilla.org/preferences-service;1"]
                      .getService(Ci.nsIPrefService)
                      .QueryInterface(Ci.nsIPrefBranch2);
+let gStringBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+                             .getService(Ci.nsIStringBundleService);
+let gMessengerBundle = gStringBundleService.createBundle(
+  "chrome://messenger/locale/messenger.properties");
+
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
@@ -145,19 +150,46 @@ function getSMTPDetails(aAccount) {
   return smtpDetails;
 }
 
+// Invert nsMsgSocketType and nsMsgAuthMethod so that we can present something
+// slightly more descriptive than a mere number. JS really should have object
+// comprehensions :(
+let gSocketTypes = {};
+for each (let [str, index] in Iterator(Ci.nsMsgSocketType))
+  gSocketTypes[index] = str;
+  
+let gAuthMethods = {};
+for each (let [str, index] in Iterator(Ci.nsMsgAuthMethod))
+  gAuthMethods[index] = str;
+// l10n properties in messenger.properties corresponding to each auth method
+let gAuthMethodProperties = {
+  "1": "authOld",
+  "2": "authPasswordCleartextInsecurely",
+  "3": "authPasswordCleartextViaSSL",
+  "4": "authPasswordEncrypted",
+  "5": "authKerberos",
+  "6": "authNTLM",
+  "8": "authAnySecure"
+};
+
+
+function getPrettyAuthMethod(aIndex) {
+  let prettyAuthMethod;
+  if (aIndex in gAuthMethodProperties) {
+    prettyAuthMethod =
+      gMessengerBundle.GetStringFromName(gAuthMethodProperties[aIndex]) +
+      " (" + (aIndex in gAuthMethods ? gAuthMethods[aIndex] : aIndex) + ")";
+  }
+  else {
+    prettyAuthMethod = aIndex in gAuthMethods ? gAuthMethods[aIndex] : aIndex;
+  }
+  return prettyAuthMethod;
+}
+
 function populateAccountsSection() {
   let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
                          .getService(Ci.nsIMsgAccountManager);
 
-  // Invert nsMsgSocketType and nsMsgAuthMethod so that we can present something
-  // slightly more descriptive than a mere number. JS really should have object
-  // comprehensions :(
-  let socketTypes = {};
-  for each (let [str, index] in Iterator(Ci.nsMsgSocketType))
-    socketTypes[index] = str;
-  let authMethods = {};
-  for each (let [str, index] in Iterator(Ci.nsMsgAuthMethod))
-    authMethods[index] = str;
+
 
   let accounts = accountManager.accounts;
   let trAccounts = [];
@@ -166,7 +198,7 @@ function populateAccountsSection() {
     let smtpDetails = getSMTPDetails(account);
 
     let smtpMarkup = [[createElement("td", smtpServer.name),
-                       createElement("td", smtpServer.authMethod),
+                       createElement("td", getPrettyAuthMethod(smtpServer.authMethod)),
                        createElement("td", smtpServer.socketType),
                        createElement("td", smtpServer.isDefault)]
                       for each ([, smtpServer] in Iterator(smtpDetails))];
@@ -187,6 +219,7 @@ function populateAccountsSection() {
     for each (let [, tds] in Iterator(smtpMarkup.slice(1)))
       trAccounts.push(createParentElement("tr", tds));
   }
+
   appendChildren(document.getElementById("accounts-tbody"), trAccounts);
 }
 
