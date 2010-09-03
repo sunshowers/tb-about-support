@@ -159,18 +159,19 @@ let gSocketTypes = {};
 for each (let [str, index] in Iterator(Ci.nsMsgSocketType))
   gSocketTypes[index] = str;
 
-function getPrettySocketType(aIndex) {
+function getSocketTypeText(aIndex) {
+  let plainSocketType = (aIndex in gSocketTypes ?
+                         gSocketTypes[aIndex] : aIndex);
   let prettySocketType;
   try {
     prettySocketType = gMessengerBundle.GetStringFromName(
-      "smtpServer-ConnectionSecurityType-" + aIndex) +
-      " (" + (aIndex in gSocketTypes ? gSocketTypes[aIndex] : aIndex) + ")";
+      "smtpServer-ConnectionSecurityType-" + aIndex);
   }
   catch (e if e.result == Components.results.NS_ERROR_FAILURE) {
     // The string wasn't found in the bundle. Make do without it.
-    prettySocketType = aIndex in gSocketTypes ? gSocketTypes[aIndex] : aIndex;
+    prettySocketType = plainSocketType;
   }
-  return prettySocketType;
+  return [prettySocketType, plainSocketType];
 }
 
 let gAuthMethods = {};
@@ -187,51 +188,60 @@ let gAuthMethodProperties = {
   "8": "authAnySecure"
 };
 
-function getPrettyAuthMethod(aIndex) {
+function getAuthMethodText(aIndex) {
   let prettyAuthMethod;
+  let plainAuthMethod = (aIndex in gAuthMethods ?
+                         gAuthMethods[aIndex] : aIndex);
   if (aIndex in gAuthMethodProperties) {
     prettyAuthMethod =
-      gMessengerBundle.GetStringFromName(gAuthMethodProperties[aIndex]) +
-      " (" + (aIndex in gAuthMethods ? gAuthMethods[aIndex] : aIndex) + ")";
+      gMessengerBundle.GetStringFromName(gAuthMethodProperties[aIndex]);
   }
   else {
-    prettyAuthMethod = aIndex in gAuthMethods ? gAuthMethods[aIndex] : aIndex;
+    prettyAuthMethod = plainAuthMethod;
   }
-  return prettyAuthMethod;
+  return [prettyAuthMethod, plainAuthMethod];
 }
 
 function populateAccountsSection() {
   let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
                          .getService(Ci.nsIMsgAccountManager);
 
-
-
   let accounts = accountManager.accounts;
   let trAccounts = [];
+
   for each (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
     let server = account.incomingServer;
     let smtpDetails = getSMTPDetails(account);
+    let smtpMarkup = [];
+    for each ([, smtpServer] in Iterator(smtpDetails)) {
+      let [prettySocketType, plainSocketType] = getSocketTypeText(
+        smtpServer.socketType);
+      let [prettyAuthMethod, plainAuthMethod] = getAuthMethodText(
+        smtpServer.authMethod);
+      smtpMarkup.push([createElement("td", smtpServer.name),
+                       createElement("td", prettySocketType, null, plainSocketType),
+                       createElement("td", prettyAuthMethod, null, plainAuthMethod),
+                       createElement("td", smtpServer.isDefault)]);
+    }
 
-    let smtpMarkup = [[createElement("td", smtpServer.name),
-                       createElement("td", getPrettySocketType(smtpServer.socketType)),
-                       createElement("td", getPrettyAuthMethod(smtpServer.authMethod)),
-                       createElement("td", smtpServer.isDefault)]
-                      for each ([, smtpServer] in Iterator(smtpDetails))];
     // smtpMarkup might not be configured, in which case add one dummy element
     // to it to appease the HTML gods below.
     if (smtpMarkup.length == 0)
       smtpMarkup = [[]];
 
+    let [prettySocketType, plainSocketType] = getSocketTypeText(server.socketType);
+    let [prettyAuthMethod, plainAuthMethod] = getAuthMethodText(server.authMethod);
+
     // Add the first SMTP server to this tr.
     let tr = createParentElement("tr", [
-      createElement("td", account.key, "", {"rowspan": smtpMarkup.length}),
-      createElement("td", server.prettyName, "", {"rowspan": smtpMarkup.length}),
+      createElement("td", account.key, {"rowspan": smtpMarkup.length}),
+      createElement("td", server.prettyName, {"rowspan": smtpMarkup.length}),
       createElement("td", "(" + server.type + ") " + server.hostName + ":" +
-                    server.port, "", {"rowspan": smtpMarkup.length}),
-      createElement("td", getPrettySocketType(server.socketType), "",
-                    {"rowspan": smtpMarkup.length}),
-      createElement("td", getPrettyAuthMethod(server.authMethod), "",
-                    {"rowspan": smtpMarkup.length}),
+                    server.port, {"rowspan": smtpMarkup.length}),
+      createElement("td", prettySocketType,
+                    {"rowspan": smtpMarkup.length}, plainSocketType),
+      createElement("td", prettyAuthMethod,
+                    {"rowspan": smtpMarkup.length}, plainAuthMethod),
     ].concat(smtpMarkup[0]));
     trAccounts.push(tr);
     // Add the remaining SMTP servers as separate trs
@@ -257,8 +267,9 @@ function populatePreferencesSection() {
 
   let trPrefs = [];
   sortedPrefs.forEach(function (pref) {
-    let tdName = createElement("td", pref.name, "pref-name");
-    let tdValue = createElement("td", formatPrefValue(pref.value), "pref-value");
+    let tdName = createElement("td", pref.name, {"class": "pref-name"});
+    let tdValue = createElement("td", formatPrefValue(pref.value),
+                                {"class": "pref-value"});
     let tr = createParentElement("tr", [tdName, tdValue]);
     trPrefs.push(tr);
   });
@@ -310,14 +321,29 @@ function createParentElement(tagName, childElems) {
   return elem;
 }
 
-function createElement(tagName, textContent, opt_class, opt_attributes) {
-  if (opt_attributes === undefined)
+function userDataHandler(aOp, aKey, aData, aSrc, aDest) {
+  if (aOp == UserDataHandler.NODE_CLONED || aOp == UserDataHandler.NODE_IMPORTED)
+    aDest.setUserData(aKey, aData, userDataHandler);
+}
+
+function createElement(tagName, textContent, opt_attributes, opt_copyData) {
+  if (opt_attributes == null)
     opt_attributes = [];
   let elem = document.createElement(tagName);
   elem.textContent = textContent;
-  elem.className = opt_class || "";
   for each (let [key, value] in Iterator(opt_attributes))
     elem.setAttribute(key, "" + value);
+
+  if (opt_copyData != null) {
+    // Look for the (only) text node.
+    let textNode = elem.firstChild;
+    while (textNode && textNode.nodeType != Node.TEXT_NODE)
+      textNode = textNode.nextSibling;
+    // XXX warn here if textNode not found
+    if (textNode)
+      textNode.setUserData("copyData", opt_copyData, userDataHandler);
+  }
+
 
   return elem;
 }
@@ -407,9 +433,12 @@ function generateTextForTextNode(node, indent, textFragmentAccumulator) {
   if (!prevNode || prevNode.nodeType == Node.TEXT_NODE)
     textFragmentAccumulator.push("\n" + indent);
 
+  // Check if we have custom data saved up. If so, use that, otherwise use
+  // the actual text contents.
+  let rawText = node.getUserData("copyData") || node.textContent;
   // Trim the text node's text content and add proper indentation after
   // any internal line breaks.
-  let text = node.textContent.trim().replace("\n", "\n" + indent, "g");
+  let text = rawText.trim().replace("\n", "\n" + indent, "g");
   textFragmentAccumulator.push(text);
 }
 
