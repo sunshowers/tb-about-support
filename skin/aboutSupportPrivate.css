@@ -11,15 +11,15 @@
  * for the specific language governing rights and limitations under the
  * License.
  *
- * The Original Code is aboutSupport.css.
+ * The Original Code is Thunderbird about:support.
  *
  * The Initial Developer of the Original Code is
  * Mozilla Foundation.
- * Portions created by the Initial Developer are Copyright (C) 2009
+ * Portions created by the Initial Developer are Copyright (C) 2010
  * the Initial Developer. All Rights Reserved.
  *
  * Contributor(s):
- *   Curtis Bartley <cbartley@mozilla.com>
+ *   Siddharth Agarwal <sid.bugzilla@gmail.com>
  *
  * Alternatively, the contents of this file may be used under the terms of
  * either the GNU General Public License Version 2 or later (the "GPL"), or
@@ -35,88 +35,6 @@
  *
  * ***** END LICENSE BLOCK ***** */
 
-html {
-  background-color: -moz-Field;
-  color: -moz-FieldText;
-  font: message-box;
-}
-
-body {
-  text-align: justify;
-  width: 90%;
-  margin-left: 5%;
-  margin-right: 5%;
-}
-
-.page-subtitle {
-  margin-bottom: 3em;
-}
-
-.major-section {
-  margin-top: 2em;
-  margin-bottom: 1em;
-  font-size: large;
-  text-align: start;
-  font-weight: bold;
-}
-
-table {
-  background-color: -moz-Dialog;
-  color: -moz-DialogText;
-  font: message-box;
-  text-align: start;
-  width: 100%;
-  border: 1px solid ThreeDShadow;
-  border-spacing: 0px;
-}
-
-.accounts-table {
-  margin-top: 1em;
-}  
-
-th, td {
-  border: 1px dotted ThreeDShadow;
-  padding: 3px;
-}
-
-thead th {
-  text-align: center;
-}
-
-th {
-  text-align: start;
-  background-color: Highlight;
-  color: HighlightText;
-}
-
-.thead-level2 > th {
-  background-color: -moz-Dialog;
-  color: -moz-DialogText;
-}
-
-th.column {
-  white-space: nowrap;
-  width: 0px;
-}
-
-td {
-  text-align: start;
-  border-top: 1px dotted ThreeDShadow;
-}
-
-.prefs-table {
-  width: 100%;
-  table-layout: fixed;
-}
-
-.pref-name {
-  width: 70%;
-  white-space: nowrap;
-  overflow: hidden;
-}
-
-.pref-value {
-  width: 30%;
-  white-space: nowrap;
-  overflow: hidden;
+.data-private {
+  display: none;
 }

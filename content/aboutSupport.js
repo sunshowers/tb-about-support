@@ -332,6 +332,10 @@ function userDataHandler(aOp, aKey, aData, aSrc, aDest) {
     aDest.setUserData(aKey, aData, userDataHandler);
 }
 
+function onShowPrivateDataChange(aCheckbox) {
+  document.getElementById("about-support-private").disabled = aCheckbox.checked;
+}
+
 function createElement(tagName, textContent, opt_attributes, opt_copyData) {
   if (opt_attributes == null)
     opt_attributes = [];
