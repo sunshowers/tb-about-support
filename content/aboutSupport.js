@@ -360,7 +360,7 @@ function copyContentsToClipboard() {
   let contentsDiv = document.getElementById("contents");
   // Deep-clone the entire div.
   let clonedDiv = contentsDiv.cloneNode(true);
-  // Go in and replace localized text with non-localized text.
+  // Go in and replace text with the text we actually want to copy.
   // (this mutates the cloned node)
   cleanUpText(clonedDiv);
   let dataHtml = clonedDiv.innerHTML;
