@@ -355,16 +355,22 @@ function appendChildren(parentElem, childNodes) {
     parentElem.appendChild(childNodes[i]);
 }
 
-function copyContentsToClipboard() {
-  // Get the HTML and text representations for the important part of the page.
+function createCleanedUpContents(aHidePrivateData) {
+  // Get the important part of the page.
   let contentsDiv = document.getElementById("contents");
   // Deep-clone the entire div.
   let clonedDiv = contentsDiv.cloneNode(true);
   // Go in and replace text with the text we actually want to copy.
   // (this mutates the cloned node)
-  cleanUpText(clonedDiv);
-  let dataHtml = clonedDiv.innerHTML;
-  let dataText = createTextForElement(clonedDiv);
+  cleanUpText(clonedDiv, aHidePrivateData);
+  return clonedDiv;
+}
+
+function copyPublicDataToClipboard() {
+  // Get the HTML and text representations for the important part of the page.
+  let contentsDiv = createCleanedUpContents(true);
+  let dataHtml = contentsDiv.innerHTML;
+  let dataText = createTextForElement(contentsDiv);
 
   // We can't use plain strings, we have to use nsSupportsString.
   let supportsStringClass = Cc["@mozilla.org/supports-string;1"];
@@ -390,7 +396,7 @@ function copyContentsToClipboard() {
   clipboard.setData(transferable, null, clipboard.kGlobalClipboard);
 }
 
-function cleanUpText(aElem) {
+function cleanUpText(aElem, aHidePrivateData) {
   let node = aElem.firstChild;
   while (node) {
     // Replace private data with a blank string
