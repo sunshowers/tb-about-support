@@ -358,8 +358,13 @@ function appendChildren(parentElem, childNodes) {
 function copyContentsToClipboard() {
   // Get the HTML and text representations for the important part of the page.
   let contentsDiv = document.getElementById("contents");
-  let dataHtml = contentsDiv.innerHTML;
-  let dataText = createTextForElement(contentsDiv);
+  // Deep-clone the entire div.
+  let clonedDiv = contentsDiv.cloneNode(true);
+  // Go in and replace localized text with non-localized text.
+  // (this mutates the cloned node)
+  cleanUpText(clonedDiv);
+  let dataHtml = clonedDiv.innerHTML;
+  let dataText = createTextForElement(clonedDiv);
 
   // We can't use plain strings, we have to use nsSupportsString.
   let supportsStringClass = Cc["@mozilla.org/supports-string;1"];
@@ -383,6 +388,22 @@ function copyContentsToClipboard() {
   let clipboard = Cc["@mozilla.org/widget/clipboard;1"]
                     .getService(Ci.nsIClipboard);
   clipboard.setData(transferable, null, clipboard.kGlobalClipboard);
+}
+
+function cleanUpText(elem) {
+  let node = elem.firstChild;
+  while (node) {
+    // Replace localized text with non-localized text
+    let copyData = node.getUserData("copyData");
+    if (copyData != null)
+      node.textContent = copyData;
+
+    if (node.nodeType == Node.ELEMENT_NODE)
+      cleanUpText(node);
+
+    // Advance!
+    node = node.nextSibling;
+  }
 }
 
 // Return the plain text representation of an element.  Do a little bit
@@ -435,12 +456,9 @@ function generateTextForTextNode(node, indent, textFragmentAccumulator) {
   if (!prevNode || prevNode.nodeType == Node.TEXT_NODE)
     textFragmentAccumulator.push("\n" + indent);
 
-  // Check if we have custom data saved up. If so, use that, otherwise use
-  // the actual text contents.
-  let rawText = node.getUserData("copyData") || node.textContent;
   // Trim the text node's text content and add proper indentation after
   // any internal line breaks.
-  let text = rawText.trim().replace("\n", "\n" + indent, "g");
+  let text = node.textContent.trim().replace("\n", "\n" + indent, "g");
   textFragmentAccumulator.push(text);
 }
 
