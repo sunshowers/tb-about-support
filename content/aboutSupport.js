@@ -235,7 +235,9 @@ function populateAccountsSection() {
     // Add the first SMTP server to this tr.
     let tr = createParentElement("tr", [
       createElement("td", account.key, {"rowspan": smtpMarkup.length}),
-      createElement("td", server.prettyName, {"rowspan": smtpMarkup.length}),
+      // The server name can contain the email address, so it is private
+      createElement("td", server.prettyName, {"rowspan": smtpMarkup.length,
+                                              "class": "data-private"}),
       createElement("td", "(" + server.type + ") " + server.hostName + ":" +
                     server.port, {"rowspan": smtpMarkup.length}),
       createElement("td", prettySocketType,
