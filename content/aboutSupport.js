@@ -390,13 +390,20 @@ function copyContentsToClipboard() {
   clipboard.setData(transferable, null, clipboard.kGlobalClipboard);
 }
 
-function cleanUpText(elem) {
-  let node = elem.firstChild;
+function cleanUpText(aElem) {
+  let node = aElem.firstChild;
   while (node) {
-    // Replace localized text with non-localized text
-    let copyData = node.getUserData("copyData");
-    if (copyData != null)
-      node.textContent = copyData;
+    // Replace private data with a blank string
+    if ("className" in node && node.className &&
+        node.className.indexOf("data-private") != -1) {
+      node.textContent = "";
+    }
+    else {
+      // Replace localized text with non-localized text
+      let copyData = node.getUserData("copyData");
+      if (copyData != null)
+        node.textContent = copyData;
+    }
 
     if (node.nodeType == Node.ELEMENT_NODE)
       cleanUpText(node);
