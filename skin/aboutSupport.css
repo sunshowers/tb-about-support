@@ -116,3 +116,8 @@ td {
   white-space: nowrap;
   overflow: hidden;
 }
+
+/* Private data is not displayed by default. */
+.data-private {
+  display: none;
+}
