@@ -51,8 +51,8 @@ let gMessengerBundle = gStringBundleService.createBundle(
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
-// Any nodes marked with this class will be considered private and will not be
-// copied if the user requests only public data to be shown or copied.
+// Any nodes marked with this class will be considered private and will be
+// hidden if the user requests only public data to be shown or copied.
 const CLASS_DATA_PRIVATE = "data-private";
 
 const ELLIPSIS = gPrefService.getComplexValue("intl.ellipsis",
