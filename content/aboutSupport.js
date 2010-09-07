@@ -51,6 +51,10 @@ let gMessengerBundle = gStringBundleService.createBundle(
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
+// Any nodes marked with this class will be considered private and will not be
+// copied if the user requests only public data to be shown or copied.
+const CLASS_DATA_PRIVATE = "data-private";
+
 const ELLIPSIS = gPrefService.getComplexValue("intl.ellipsis",
                                               Ci.nsIPrefLocalizedString).data;
 
@@ -237,7 +241,7 @@ function populateAccountsSection() {
       createElement("td", account.key, {"rowspan": smtpMarkup.length}),
       // The server name can contain the email address, so it is private
       createElement("td", server.prettyName, {"rowspan": smtpMarkup.length,
-                                              "class": "data-private"}),
+                                              "class": CLASS_DATA_PRIVATE}),
       createElement("td", "(" + server.type + ") " + server.hostName + ":" +
                     server.port, {"rowspan": smtpMarkup.length}),
       createElement("td", prettySocketType,
@@ -401,7 +405,7 @@ function cleanUpText(aElem, aHidePrivateData) {
   while (node) {
     // Replace private data with a blank string
     if ("className" in node && node.className &&
-        node.className.indexOf("data-private") != -1) {
+        node.className.indexOf(CLASS_DATA_PRIVATE) != -1) {
       node.textContent = "";
     }
     else {
