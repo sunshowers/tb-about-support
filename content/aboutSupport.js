@@ -363,17 +363,6 @@ function appendChildren(parentElem, childNodes) {
     parentElem.appendChild(childNodes[i]);
 }
 
-function createCleanedUpContents(aHidePrivateData) {
-  // Get the important part of the page.
-  let contentsDiv = document.getElementById("contents");
-  // Deep-clone the entire div.
-  let clonedDiv = contentsDiv.cloneNode(true);
-  // Go in and replace text with the text we actually want to copy.
-  // (this mutates the cloned node)
-  cleanUpText(clonedDiv, aHidePrivateData);
-  return clonedDiv;
-}
-
 function copyPublicDataToClipboard() {
   // Get the HTML and text representations for the important part of the page.
   let contentsDiv = createCleanedUpContents(true);
@@ -404,11 +393,48 @@ function copyPublicDataToClipboard() {
   clipboard.setData(transferable, null, clipboard.kGlobalClipboard);
 }
 
+function composeMessageWithPrivateData() {
+  // Get the HTML and representation for the important part of the page.
+  let contentsDiv = createCleanedUpContents(false);
+  let dataHtml = contentsDiv.innerHTML;
+  // The editor considers whitespace to be significant, so replace all
+  // whitespace with a single space.
+  dataHtml = dataHtml.replace(/\s+/g, " ");
+
+  // Set up parameters and fields to use for the compose window.
+  let params = Cc["@mozilla.org/messengercompose/composeparams;1"]
+                 .createInstance(Ci.nsIMsgComposeParams);
+  params.type = Ci.nsIMsgCompType.New;
+  params.format = Ci.nsIMsgCompFormat.HTML;
+
+  let fields = Cc["@mozilla.org/messengercompose/composefields;1"]
+                 .createInstance(Ci.nsIMsgCompFields);
+  fields.forcePlainText = false;
+  fields.body = dataHtml;
+  params.composeFields = fields;
+
+  // Compose the message.
+  let composeService = Cc["@mozilla.org/messengercompose;1"]
+                         .getService(Ci.nsIMsgComposeService);
+  composeService.OpenComposeWindowWithParams(null, params);
+}
+
+function createCleanedUpContents(aHidePrivateData) {
+  // Get the important part of the page.
+  let contentsDiv = document.getElementById("contents");
+  // Deep-clone the entire div.
+  let clonedDiv = contentsDiv.cloneNode(true);
+  // Go in and replace text with the text we actually want to copy.
+  // (this mutates the cloned node)
+  cleanUpText(clonedDiv, aHidePrivateData);
+  return clonedDiv;
+}
+
 function cleanUpText(aElem, aHidePrivateData) {
   let node = aElem.firstChild;
   while (node) {
     // Replace private data with a blank string
-    if ("className" in node && node.className &&
+    if (aHidePrivateData && "className" in node && node.className &&
         node.className.indexOf(CLASS_DATA_PRIVATE) != -1) {
       node.textContent = "";
     }
