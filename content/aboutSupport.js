@@ -411,6 +411,10 @@ function composeMessageWithPrivateData() {
                  .createInstance(Ci.nsIMsgCompFields);
   fields.forcePlainText = false;
   fields.body = dataHtml;
+  // In general we can have non-ASCII characters
+  fields.characterSet = "UTF-8";
+  fields.bodyIsAsciiOnly = false;
+  fields.needToCheckCharset = true;
   params.composeFields = fields;
 
   // Compose the message.
