@@ -420,7 +420,7 @@ function composeMessageWithPrivateData() {
   fields.bodyIsAsciiOnly = false;
   params.composeFields = fields;
 
-  // Compose the message.
+  // Our params are set up. Now open a compose window.
   let composeService = Cc["@mozilla.org/messengercompose;1"]
                          .getService(Ci.nsIMsgComposeService);
   composeService.OpenComposeWindowWithParams(null, params);
