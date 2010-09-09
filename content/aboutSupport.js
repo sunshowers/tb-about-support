@@ -36,6 +36,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+"use strict";
+
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 Components.utils.import("resource:///modules/iteratorUtils.jsm");
