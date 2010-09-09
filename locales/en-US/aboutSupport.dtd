@@ -21,6 +21,14 @@
 <!ENTITY aboutSupport.appBasicsBuildConfig "Build Configuration">
 
 <!ENTITY aboutSupport.accountsTitle "Mail and News Accounts">
+<!ENTITY aboutSupport.showPrivateData "Show private data">
+<!ENTITY aboutSupport.accountsID "ID">
+<!ENTITY aboutSupport.accountsName "Name">
+<!ENTITY aboutSupport.accountsIncomingServer "Incoming server">
+<!ENTITY aboutSupport.accountsOutgoingServers "Outgoing servers">
+<!ENTITY aboutSupport.accountsConnSecurity "Connection security">
+<!ENTITY aboutSupport.accountsAuthMethod "Authentication method">
+<!ENTITY aboutSupport.accountsDefault "Default?">
 
 <!ENTITY aboutSupport.modifiedPrefsTitle "Modified Preferences">
 <!ENTITY aboutSupport.modifiedPrefsName "Name">
@@ -30,3 +38,4 @@
 <!ENTITY aboutSupport.updateHistoryTitle "Update History">
 
 <!ENTITY aboutSupport.copyPublicDataToClipboard.label "Copy public data to clipboard">
+<!ENTITY aboutSupport.composeWithPrivateData.label "Compose e-mail with private data">
