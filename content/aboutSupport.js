@@ -453,7 +453,7 @@ function cleanUpText(aElem, aHidePrivateData) {
     }
 
     if (node.nodeType == Node.ELEMENT_NODE)
-      cleanUpText(node);
+      cleanUpText(node, aHidePrivateData);
 
     // Advance!
     node = node.nextSibling;
