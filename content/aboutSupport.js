@@ -54,11 +54,13 @@ let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
 // Any nodes marked with this class will be considered part of the UI only,
-// and therefore will not be copied.
+// and therefore will not be copied. An element can be either CLASS_DATA_UIONLY
+// or CLASS_DATA_PRIVATE, but not both.
 const CLASS_DATA_UIONLY = "data-uionly";
 
 // Any nodes marked with this class will be considered private and will be
-// hidden if the user requests only public data to be shown or copied.
+// hidden if the user requests only public data to be shown or copied. An
+// element can be either CLASS_DATA_PRIVATE or CLASS_DATA_UIONLY, but not both.
 const CLASS_DATA_PRIVATE = "data-private";
 
 const ELLIPSIS = gPrefService.getComplexValue("intl.ellipsis",
@@ -450,7 +452,7 @@ function cleanUpText(aElem, aHidePrivateData) {
       aElem.removeChild(node);
     }
     // Replace private data with a blank string
-    if (aHidePrivateData && className.indexOf(CLASS_DATA_PRIVATE) != -1) {
+    else if (aHidePrivateData && className.indexOf(CLASS_DATA_PRIVATE) != -1) {
       node.textContent = "";
     }
     else {
