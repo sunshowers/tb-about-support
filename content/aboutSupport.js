@@ -53,6 +53,10 @@ let gMessengerBundle = gStringBundleService.createBundle(
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
+// Any nodes marked with this class will be considered part of the UI only,
+// and therefore will not be copied.
+const CLASS_DATA_UIONLY = "data-uionly";
+
 // Any nodes marked with this class will be considered private and will be
 // hidden if the user requests only public data to be shown or copied.
 const CLASS_DATA_PRIVATE = "data-private";
@@ -440,9 +444,13 @@ function createCleanedUpContents(aHidePrivateData) {
 function cleanUpText(aElem, aHidePrivateData) {
   let node = aElem.firstChild;
   while (node) {
+    let className = ("className" in node && node.className) || "";
+    // Delete uionly nodes.
+    if (className.indexOf(CLASS_DATA_UIONLY) != -1) {
+      aElem.removeChild(node);
+    }
     // Replace private data with a blank string
-    if (aHidePrivateData && "className" in node && node.className &&
-        node.className.indexOf(CLASS_DATA_PRIVATE) != -1) {
+    if (aHidePrivateData && className.indexOf(CLASS_DATA_PRIVATE) != -1) {
       node.textContent = "";
     }
     else {
@@ -488,7 +496,6 @@ function generateTextForElement(elem, indent, textFragmentAccumulator) {
   // Generate the text representation for each child node.
   let node = elem.firstChild;
   while (node) {
-
     if (node.nodeType == Node.TEXT_NODE) {
       // Text belonging to this element uses its indentation level.
       generateTextForTextNode(node, indent, textFragmentAccumulator);
