@@ -371,6 +371,23 @@ function appendChildren(parentElem, childNodes) {
     parentElem.appendChild(childNodes[i]);
 }
 
+/**
+ * Create warning text to add to any private data.
+ * @returns A HTML paragraph node containing the warning.
+ */
+function createWarning() {
+  let warningP = document.createElement("p");
+  let warningStrong = document.createElement("strong");
+  let warningHeader = document.createTextNode("WARNING: ");
+  warningStrong.insertBefore(warningHeader, null);
+  warningP.insertBefore(warningStrong, null);
+  let warning = document.createTextNode(
+    "This email contains sensitive information which shouldn't be forwarded " +
+    "or published without permission.");
+  warningP.insertBefore(warning, null);
+  return warningP;
+}
+
 function copyPublicDataToClipboard() {
   // Get the HTML and text representations for the important part of the page.
   let contentsDiv = createCleanedUpContents(true);
@@ -404,6 +421,8 @@ function copyPublicDataToClipboard() {
 function composeMessageWithPrivateData() {
   // Get the HTML and representation for the important part of the page.
   let contentsDiv = createCleanedUpContents(false);
+  // Add a warning at the beginning of the message.
+  contentsDiv.insertBefore(createWarning(), contentsDiv.firstChild);
   let dataHtml = contentsDiv.innerHTML;
   // The editor considers whitespace to be significant, so replace all
   // whitespace with a single space.
