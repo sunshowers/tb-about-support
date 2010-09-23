@@ -37,5 +37,5 @@
 <!ENTITY aboutSupport.installationHistoryTitle "Installation History">
 <!ENTITY aboutSupport.updateHistoryTitle "Update History">
 
-<!ENTITY aboutSupport.copyPublicDataToClipboard.label "Copy public data to clipboard">
-<!ENTITY aboutSupport.composeWithPrivateData.label "Compose e-mail with private data">
+<!ENTITY aboutSupport.copyToClipboard.label "Copy to clipboard">
+<!ENTITY aboutSupport.sendViaEmail.label "Send via email">

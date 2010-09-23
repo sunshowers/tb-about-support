@@ -388,9 +388,10 @@ function createWarning() {
   return warningP;
 }
 
-function copyPublicDataToClipboard() {
+function copyToClipboard() {
   // Get the HTML and text representations for the important part of the page.
-  let contentsDiv = createCleanedUpContents(true);
+  let hidePrivateData = !document.getElementById("check-show-private-data").checked;
+  let contentsDiv = createCleanedUpContents(hidePrivateData);
   let dataHtml = contentsDiv.innerHTML;
   let dataText = createTextForElement(contentsDiv);
 
@@ -418,9 +419,10 @@ function copyPublicDataToClipboard() {
   clipboard.setData(transferable, null, clipboard.kGlobalClipboard);
 }
 
-function composeMessageWithPrivateData() {
-  // Get the HTML and representation for the important part of the page.
-  let contentsDiv = createCleanedUpContents(false);
+function sendViaEmail() {
+  // Get the HTML representation for the important part of the page.
+  let hidePrivateData = !document.getElementById("check-show-private-data").checked;
+  let contentsDiv = createCleanedUpContents(hidePrivateData);
   // Add a warning at the beginning of the message.
   contentsDiv.insertBefore(createWarning(), contentsDiv.firstChild);
   let dataHtml = contentsDiv.innerHTML;
