@@ -21,7 +21,8 @@
 <!ENTITY aboutSupport.appBasicsBuildConfig "Build Configuration">
 
 <!ENTITY aboutSupport.accountsTitle "Mail and News Accounts">
-<!ENTITY aboutSupport.showPrivateData "Include account names">
+<!ENTITY aboutSupport.showPrivateData.mainText "Include account names">
+<!ENTITY aboutSupport.showPrivateData.explanationText "(possibly identifying information)">
 <!ENTITY aboutSupport.accountsID "ID">
 <!ENTITY aboutSupport.accountsName "Name">
 <!ENTITY aboutSupport.accountsIncomingServer "Incoming server">

@@ -48,6 +48,10 @@ body {
   margin-right: 5%;
 }
 
+.gray-text {
+  color: GrayText;
+}
+
 .page-subtitle {
   margin-bottom: 3em;
 }
