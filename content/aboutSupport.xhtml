@@ -76,6 +76,9 @@
       <button onclick="sendViaEmail()">
         &aboutSupport.sendViaEmail.label;
       </button>
+      <input type="checkbox" id="check-show-private-data" class="data-uionly"
+             onchange="onShowPrivateDataChange(this);" />
+      <label for="check-show-private-data">&aboutSupport.showPrivateData;</label>
     </div>
 
     <div id="contents">
@@ -172,12 +175,6 @@
       <h2 class="major-section">
         &aboutSupport.accountsTitle;
       </h2>
-
-      <div class="data-uionly">
-        <input type="checkbox" id="check-show-private-data"
-               onchange="onShowPrivateDataChange(this);" />
-        <label for="check-show-private-data">&aboutSupport.showPrivateData;</label>
-      </div>
 
       <table class="accounts-table">
         <thead>
