@@ -119,8 +119,8 @@ window.onload = function () {
   document.getElementById("supportLink").href = supportUrl;
 
   // Update the other sections.
-  populatePreferencesSection();
   populateAccountsSection();
+  populatePreferencesSection();
   populateExtensionsSection();
 }
 
