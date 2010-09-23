@@ -468,7 +468,12 @@ function cleanUpText(aElem, aHidePrivateData) {
     let className = ("className" in node && node.className) || "";
     // Delete uionly nodes.
     if (className.indexOf(CLASS_DATA_UIONLY) != -1) {
+      // Advance to the next node before removing the current node, since
+      // node.nextSibling is null after removeChild
+      let nextNode = node.nextSibling;
       aElem.removeChild(node);
+      node = nextNode;
+      continue;
     }
     // Replace private data with a blank string
     else if (aHidePrivateData && className.indexOf(CLASS_DATA_PRIVATE) != -1) {
