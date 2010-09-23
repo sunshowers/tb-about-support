@@ -120,3 +120,8 @@ td {
   white-space: nowrap;
   overflow: hidden;
 }
+
+td.data-private {
+  background-color: infobackground;
+  color: infotext;
+}
