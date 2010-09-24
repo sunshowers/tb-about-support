@@ -74,10 +74,6 @@ table {
   border-spacing: 0px;
 }
 
-.accounts-table {
-  margin-top: 1em;
-}  
-
 th, td {
   border: 1px dotted ThreeDShadow;
   padding: 3px;
