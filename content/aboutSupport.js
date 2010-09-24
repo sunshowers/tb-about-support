@@ -376,16 +376,12 @@ function appendChildren(parentElem, childNodes) {
  * @returns A HTML paragraph node containing the warning.
  */
 function createWarning() {
-  let warningP = document.createElement("p");
-  let warningStrong = document.createElement("strong");
-  let warningHeader = document.createTextNode("WARNING: ");
-  warningStrong.insertBefore(warningHeader, null);
-  warningP.insertBefore(warningStrong, null);
-  let warning = document.createTextNode(
-    "This email contains sensitive information which shouldn't be forwarded " +
-    "or published without permission.");
-  warningP.insertBefore(warning, null);
-  return warningP;
+  return createParentElement("p", [
+    createElement("strong", "WARNING: "),
+    document.createTextNode(
+      "This contains sensitive information which shouldn't be forwarded or " +
+      "published without permission."),
+    ]);
 }
 
 function copyToClipboard() {
@@ -423,8 +419,6 @@ function sendViaEmail() {
   // Get the HTML representation for the important part of the page.
   let hidePrivateData = !document.getElementById("check-show-private-data").checked;
   let contentsDiv = createCleanedUpContents(hidePrivateData);
-  // Add a warning at the beginning of the message.
-  contentsDiv.insertBefore(createWarning(), contentsDiv.firstChild);
   let dataHtml = contentsDiv.innerHTML;
   // The editor considers whitespace to be significant, so replace all
   // whitespace with a single space.
@@ -461,6 +455,9 @@ function createCleanedUpContents(aHidePrivateData) {
   // Go in and replace text with the text we actually want to copy.
   // (this mutates the cloned node)
   cleanUpText(clonedDiv, aHidePrivateData);
+  // Insert a warning if we need to
+  if (!aHidePrivateData)
+    clonedDiv.insertBefore(createWarning(), clonedDiv.firstChild);
   return clonedDiv;
 }
 
