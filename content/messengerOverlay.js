@@ -36,10 +36,45 @@
  * ***** END LICENSE BLOCK ***** */
 
 var AboutSupport = {
-  openInNewTab: function aboutSupport_openInNewTab() {
+  get _protocolSvc() {
+    delete this._protocolSvc;
+    return this._protocolSvc =
+      Components.classes["@mozilla.org/uriloader/external-protocol-service;1"]
+                .getService(Components.interfaces.nsIExternalProtocolService);
+  },
+  /**
+   * Handles links while displaying the about:support page. about: links are
+   * opened in a new tab, and anything else is redirected to an external
+   * browser. This is modeled after specialTabs.aboutClickHandler().
+   */
+  clickHandler: function AboutSupport_clickHandler(aEvent) {
+    // Don't handle events that: a) aren't trusted, b) have already been
+    // handled or c) aren't left-click.
+    if (!aEvent.isTrusted || aEvent.getPreventDefault() || aEvent.button)
+      return true;
+
+    let href = hRefForClickEvent(aEvent, true);
+    if (href) {
+      let tabmail = document.getElementById("tabmail");
+      let uri = makeURI(href);
+      if (uri.schemeIs("about")) {
+        aEvent.preventDefault();
+        tabmail.openTab("contentTab",
+                        {contentPage: href,
+                         clickHandler: "specialTabs.aboutClickHandler(event);"});
+      }
+      else if (!this._protocolSvc.isExposedProtocol(uri.scheme) ||
+               uri.schemeIs("http") || uri.schemeIs("https")) {
+        aEvent.preventDefault();
+        openLinkExternally(href);
+      }
+    }
+  },
+
+  openInNewTab: function AboutSupport_openInNewTab() {
     let tabmail = document.getElementById("tabmail");
     tabmail.openTab("contentTab",
                     {contentPage: "chrome://about-support/content/aboutSupport.xhtml",
-                     clickHandler: "specialTabs.aboutClickHandler(event);" });
+                     clickHandler: "AboutSupport.clickHandler(event);" });
   }
 };
