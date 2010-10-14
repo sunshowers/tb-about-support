@@ -40,7 +40,9 @@
 
 const Cc = Components.classes;
 const Ci = Components.interfaces;
+
 Components.utils.import("resource:///modules/iteratorUtils.jsm");
+Components.utils.import("resource://gre/modules/AddonManager.jsm");
 
 let gPrefService = Cc["@mozilla.org/preferences-service;1"]
                      .getService(Ci.nsIPrefService)
@@ -125,19 +127,20 @@ window.onload = function () {
 }
 
 function populateExtensionsSection() {
-  let extensions = Application.extensions.all;
-  let trExtensions = [];
-  for (let i = 0; i < extensions.length; i++) {
-    let extension = extensions[i];
-    let tr = createParentElement("tr", [
-      createElement("td", extension.name),
-      createElement("td", extension.version),
-      createElement("td", extension.enabled),
-      createElement("td", extension.id),
-    ]);
-    trExtensions.push(tr);
-  }
-  appendChildren(document.getElementById("extensions-tbody"), trExtensions);
+  AddonManager.getAddonsByTypes(["extension"], function (extensions) {
+    let trExtensions = [];
+    for (let i = 0; i < extensions.length; i++) {
+      let extension = extensions[i];
+      let tr = createParentElement("tr", [
+        createElement("td", extension.name),
+        createElement("td", extension.version),
+        createElement("td", extension.enabled),
+        createElement("td", extension.id),
+      ]);
+      trExtensions.push(tr);
+    }
+    appendChildren(document.getElementById("extensions-tbody"), trExtensions);
+  });
 }
 
 /**
