@@ -43,6 +43,7 @@ const Ci = Components.interfaces;
 
 Components.utils.import("resource:///modules/iteratorUtils.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
+Components.utils.import("resource://gre/modules/Services.jsm");
 
 let gPrefService = Cc["@mozilla.org/preferences-service;1"]
                      .getService(Ci.nsIPrefService)
@@ -379,12 +380,14 @@ function appendChildren(parentElem, childNodes) {
  * @returns A HTML paragraph node containing the warning.
  */
 function createWarning() {
+  let bundle = Services.strings.createBundle(
+    "chrome://about-support/locale/aboutSupport.properties");
   return createParentElement("p", [
-    createElement("strong", "WARNING: "),
-    document.createTextNode(
-      "This contains sensitive information which shouldn't be forwarded or " +
-      "published without permission."),
-    ]);
+    createElement("strong", bundle.GetStringFromName("warningLabel")),
+    // Add some whitespace between the label and the text
+    document.createTextNode(" "),
+    document.createTextNode(bundle.GetStringFromName("warningText")),
+  ]);
 }
 
 function copyToClipboard() {
