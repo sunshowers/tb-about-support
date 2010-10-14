@@ -40,3 +40,5 @@
 
 <!ENTITY aboutSupport.copyToClipboard.label "Copy to clipboard">
 <!ENTITY aboutSupport.sendViaEmail.label "Send via email">
+
+<!ENTITY aboutSupport.graphicsTitle "Graphics">

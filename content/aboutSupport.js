@@ -125,6 +125,7 @@ window.onload = function () {
   populateAccountsSection();
   populatePreferencesSection();
   populateExtensionsSection();
+  populateGraphicsSection();
 }
 
 function populateExtensionsSection() {
