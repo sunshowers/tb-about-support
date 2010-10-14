@@ -376,12 +376,16 @@ function appendChildren(parentElem, childNodes) {
  * @returns A HTML paragraph node containing the warning.
  */
 function createWarning() {
+  let bundleService = Cc["@mozilla.org/intl/stringbundle;1"]
+                        .getService(Ci.nsIStringBundleService);
+  let bundle = bundleService.createBundle(
+    "chrome://about-support/locale/aboutSupport.properties");
   return createParentElement("p", [
-    createElement("strong", "WARNING: "),
-    document.createTextNode(
-      "This contains sensitive information which shouldn't be forwarded or " +
-      "published without permission."),
-    ]);
+    createElement("strong", bundle.GetStringFromName("warningLabel")),
+    // Add some whitespace between the label and the text
+    document.createTextNode(" "),
+    document.createTextNode(bundle.GetStringFromName("warningText")),
+  ]);
 }
 
 function copyToClipboard() {
