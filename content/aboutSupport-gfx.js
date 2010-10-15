@@ -36,6 +36,8 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
+"use strict";
+
 function populateGraphicsSection() {
   function createHeader(name)
   {
