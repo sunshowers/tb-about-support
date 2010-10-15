@@ -45,14 +45,8 @@ Components.utils.import("resource:///modules/iteratorUtils.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 
-let gPrefService = Cc["@mozilla.org/preferences-service;1"]
-                     .getService(Ci.nsIPrefService)
-                     .QueryInterface(Ci.nsIPrefBranch2);
-let gStringBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
-                             .getService(Ci.nsIStringBundleService);
-let gMessengerBundle = gStringBundleService.createBundle(
+let gMessengerBundle = Services.strings.createBundle(
   "chrome://messenger/locale/messenger.properties");
-
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
@@ -66,8 +60,8 @@ const CLASS_DATA_UIONLY = "data-uionly";
 // element can be either CLASS_DATA_PRIVATE or CLASS_DATA_UIONLY, but not both.
 const CLASS_DATA_PRIVATE = "data-private";
 
-const ELLIPSIS = gPrefService.getComplexValue("intl.ellipsis",
-                                              Ci.nsIPrefLocalizedString).data;
+const ELLIPSIS = Services.prefs.getComplexValue("intl.ellipsis",
+                                                Ci.nsIPrefLocalizedString).data;
 
 // We use a preferences whitelist to make sure we only show preferences that
 // are useful for support and won't compromise the user's privacy.  Note that
@@ -112,9 +106,7 @@ const PREFS_BLACKLIST = [
 
 window.onload = function () {
   // Get the support URL.
-  let urlFormatter = Cc["@mozilla.org/toolkit/URLFormatterService;1"]
-                       .getService(Ci.nsIURLFormatter);
-  let supportUrl = urlFormatter.formatURLPref("app.support.baseURL");
+  let supportUrl = Services.urlFormatter.formatURLPref("app.support.baseURL");
 
   // Update the application basics section.
   document.getElementById("application-box").textContent = Application.name;
@@ -316,7 +308,7 @@ function getModifiedPrefs() {
   let prefNames = getWhitelistedPrefNames();
   let prefs = [Application.prefs.get(prefName)
                       for each (prefName in prefNames)
-                          if (gPrefService.prefHasUserValue(prefName)
+                          if (Services.prefs.prefHasUserValue(prefName)
                             && !isBlacklisted(prefName))];
   return prefs;
 }
@@ -324,7 +316,7 @@ function getModifiedPrefs() {
 function getWhitelistedPrefNames() {
   let results = [];
   PREFS_WHITELIST.forEach(function (prefStem) {
-    let prefNames = gPrefService.getChildList(prefStem, {});
+    let prefNames = Services.prefs.getChildList(prefStem, {});
     results = results.concat(prefNames);
   });
   return results;
@@ -557,9 +549,7 @@ function generateTextForTextNode(node, indent, textFragmentAccumulator) {
 
 function openProfileDirectory() {
   // Get the profile directory.
-  let propertiesService = Cc["@mozilla.org/file/directory_service;1"]
-                            .getService(Ci.nsIProperties);
-  let currProfD = propertiesService.get("ProfD", Ci.nsIFile);
+  let currProfD = Services.dirsvc.get("ProfD", Ci.nsIFile);
   let profileDir = currProfD.path;
 
   // Show the profile directory.
