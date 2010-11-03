@@ -125,7 +125,9 @@ window.onload = function () {
   document.getElementById("application-box").textContent = Application.name;
   document.getElementById("version-box").textContent = Application.version;
   document.getElementById("supportLink").href = supportUrl;
-  let currProfD = Services.dirsvc.get("ProfD", Ci.nsIFile);
+  let propertiesService = Cc["@mozilla.org/file/directory_service;1"]
+                            .getService(Ci.nsIProperties);
+  let currProfD = propertiesService.get("ProfD", Ci.nsIFile);
   appendChildren(document.getElementById("profile-dir-box"),
     [createElement("a", currProfD.path,
       {"href": "#",
