@@ -125,3 +125,7 @@ td.data-private {
   background-color: infobackground;
   color: infotext;
 }
+
+.data-public {
+  display: none;
+}

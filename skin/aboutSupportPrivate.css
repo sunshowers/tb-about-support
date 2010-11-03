@@ -38,3 +38,7 @@
 .data-private {
   display: none;
 }
+
+.data-public {
+  display: inline;
+}
