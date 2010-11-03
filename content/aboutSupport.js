@@ -116,6 +116,8 @@ window.onload = function () {
   document.getElementById("application-box").textContent = Application.name;
   document.getElementById("version-box").textContent = Application.version;
   document.getElementById("supportLink").href = supportUrl;
+  let currProfD = Services.dirsvc.get("ProfD", Ci.nsIFile);
+  document.getElementById("profile-dir-box").textContent = currProfD.path;
 
   // Update the other sections.
   populateAccountsSection();
