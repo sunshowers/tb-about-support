@@ -483,6 +483,10 @@ function cleanUpText(aElem, aHidePrivateData) {
     else if (aHidePrivateData && className.indexOf(CLASS_DATA_PRIVATE) != -1) {
       node.textContent = "";
     }
+    // Replace public data with a blank string
+    else if (!aHidePrivateData && className.indexOf(CLASS_DATA_PUBLIC) != -1) {
+      node.textContent = "";
+    }
     else {
       // Replace localized text with non-localized text
       let copyData = node.getUserData("copyData");
