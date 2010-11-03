@@ -53,15 +53,23 @@ let gMessengerBundle = gStringBundleService.createBundle(
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
+/* Node classes. All of these are mutually exclusive. */
+
 // Any nodes marked with this class will be considered part of the UI only,
 // and therefore will not be copied. An element can be either CLASS_DATA_UIONLY
 // or CLASS_DATA_PRIVATE, but not both.
+// and therefore will not be copied.
 const CLASS_DATA_UIONLY = "data-uionly";
 
 // Any nodes marked with this class will be considered private and will be
 // hidden if the user requests only public data to be shown or copied. An
 // element can be either CLASS_DATA_PRIVATE or CLASS_DATA_UIONLY, but not both.
+// hidden if the user requests only public data to be shown or copied.
 const CLASS_DATA_PRIVATE = "data-private";
+
+// Any nodes marked with this class will only be displayed when the user chooses
+// to not display private data.
+const CLASS_DATA_PUBLIC = "data-public";
 
 const ELLIPSIS = gPrefService.getComplexValue("intl.ellipsis",
                                               Ci.nsIPrefLocalizedString).data;
