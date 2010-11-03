@@ -117,7 +117,11 @@ window.onload = function () {
   document.getElementById("version-box").textContent = Application.version;
   document.getElementById("supportLink").href = supportUrl;
   let currProfD = Services.dirsvc.get("ProfD", Ci.nsIFile);
-  document.getElementById("profile-dir-box").textContent = currProfD.path;
+  appendChildren(document.getElementById("profile-dir-box"),
+    [createElement("a", currProfD.path,
+      {"href": "#",
+       "onclick": "openProfileDirectory(); event.preventDefault();"
+      })]);
 
   // Update the other sections.
   populateAccountsSection();
