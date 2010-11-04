@@ -138,7 +138,7 @@ function populateExtensionsSection() {
       let tr = createParentElement("tr", [
         createElement("td", extension.name),
         createElement("td", extension.version),
-        createElement("td", extension.enabled),
+        createElement("td", extension.isActive),
         createElement("td", extension.id),
       ]);
       trExtensions.push(tr);
