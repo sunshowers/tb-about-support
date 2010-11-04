@@ -133,6 +133,11 @@ window.onload = function () {
       {"href": "#",
        "onclick": "openProfileDirectory(); event.preventDefault();"
       })]);
+  let appInfo = Cc["@mozilla.org/xre/app-info;1"]
+                  .getService(Ci.nsIXULAppInfo)
+                  .QueryInterface(Ci.nsIXULRuntime);
+  document.getElementById("buildid-box").textContent = appInfo.appBuildID;
+  document.getElementById("useragent-box").textContent = navigator.userAgent;
 
   // Update the other sections.
   populateAccountsSection();
