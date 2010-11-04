@@ -530,7 +530,7 @@ function createTextForElement(elem) {
 
 function generateTextForElement(elem, indent, textFragmentAccumulator) {
   // Add a little extra spacing around most elements.
-  if (elem.tagName != "td")
+  if (elem.tagName != "td" && elem.tagName != "th")
     textFragmentAccumulator.push("\n");
 
   // Generate the text representation for each child node.
