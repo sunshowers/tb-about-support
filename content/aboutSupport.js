@@ -122,6 +122,8 @@ window.onload = function () {
       {"href": "#",
        "onclick": "openProfileDirectory(); event.preventDefault();"
       })]);
+  document.getElementById("buildid-box").textContent = Services.appinfo.appBuildID;
+  document.getElementById("useragent-box").textContent = navigator.userAgent;
 
   // Update the other sections.
   populateAccountsSection();
