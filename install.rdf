@@ -6,7 +6,7 @@
   <Description about="urn:mozilla:install-manifest">
     <em:id>tbaboutsupport@mozillamessaging.com</em:id>
     <em:name>about:support</em:name>
-    <em:version>0.1</em:version>
+    <em:version>0.15-trunk</em:version>
 
     <em:description>A Mozilla Messaging addon to assist in product support.</em:description>
     <em:creator>Mozilla Messaging Team</em:creator>
