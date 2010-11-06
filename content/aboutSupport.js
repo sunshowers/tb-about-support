@@ -544,8 +544,19 @@ function createTextForElement(elem) {
 
 function generateTextForElement(elem, indent, textFragmentAccumulator) {
   // Add a little extra spacing around most elements.
-  if (elem.tagName != "td" && elem.tagName != "th")
+  if (["td", "th", "span", "a"].indexOf(elem.tagName) == -1)
     textFragmentAccumulator.push("\n");
+
+  let childCount = elem.childElementCount;
+
+  // We're not going to spread a two-column <tr> across multiple lines, so
+  // handle that separately.
+  if (elem.tagName == "tr" && childCount == 2) {
+    textFragmentAccumulator.push(indent);
+    textFragmentAccumulator.push(elem.children[0].textContent.trim() + ": " +
+                                 elem.children[1].textContent.trim());
+    return;
+  }
 
   // Generate the text representation for each child node.
   let node = elem.firstChild;
@@ -555,10 +566,11 @@ function generateTextForElement(elem, indent, textFragmentAccumulator) {
       generateTextForTextNode(node, indent, textFragmentAccumulator);
     }
     else if (node.nodeType == Node.ELEMENT_NODE) {
-      // Recurse on the child element with an extra level of indentation.
-      generateTextForElement(node, indent + "  ", textFragmentAccumulator);
+      // Recurse on the child element with an extra level of indentation (but
+      // only if there's more than one child).
+      generateTextForElement(node, indent + (childCount > 1 ? "  " : ""),
+                             textFragmentAccumulator);
     }
-
     // Advance!
     node = node.nextSibling;
   }
