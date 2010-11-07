@@ -124,6 +124,7 @@ window.onload = function () {
   // Update the application basics section.
   document.getElementById("application-box").textContent = Application.name;
   document.getElementById("version-box").textContent = Application.version;
+  document.getElementById("useragent-box").textContent = navigator.userAgent;
   document.getElementById("supportLink").href = supportUrl;
   let propertiesService = Cc["@mozilla.org/file/directory_service;1"]
                             .getService(Ci.nsIProperties);
@@ -137,7 +138,6 @@ window.onload = function () {
                   .getService(Ci.nsIXULAppInfo)
                   .QueryInterface(Ci.nsIXULRuntime);
   document.getElementById("buildid-box").textContent = appInfo.appBuildID;
-  document.getElementById("useragent-box").textContent = navigator.userAgent;
 
   // Update the other sections.
   populateAccountsSection();
