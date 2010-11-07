@@ -115,6 +115,7 @@ window.onload = function () {
   // Update the application basics section.
   document.getElementById("application-box").textContent = Application.name;
   document.getElementById("version-box").textContent = Application.version;
+  document.getElementById("useragent-box").textContent = navigator.userAgent;
   document.getElementById("supportLink").href = supportUrl;
   let currProfD = Services.dirsvc.get("ProfD", Ci.nsIFile);
   appendChildren(document.getElementById("profile-dir-box"),
@@ -123,7 +124,6 @@ window.onload = function () {
        "onclick": "openProfileDirectory(); event.preventDefault();"
       })]);
   document.getElementById("buildid-box").textContent = Services.appinfo.appBuildID;
-  document.getElementById("useragent-box").textContent = navigator.userAgent;
 
   // Update the other sections.
   populateAccountsSection();
