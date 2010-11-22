@@ -1,5 +1,8 @@
-content about-support content/
-locale about-support en-US locales/en-US/
-skin about-support classic/1.0 skin/
+content about-support content/ appversion>=3.1 appversion<=3.1.*
+locale about-support en-US locales/en-US/ appversion>=3.1 appversion<=3.1.*
+skin about-support classic/1.0 skin/ appversion>=3.1 appversion<=3.1.*
+content about-support chrome-trunk/content/ appversion>=3.3a1pre
+locale about-support en-US chrome-trunk/locales/en-US/ appversion>=3.3a1pre
+skin about-support classic/1.0 chrome-trunk/skin/ appversion>=3.3a1pre
 overlay chrome://messenger/content/messenger.xul chrome://about-support/content/messengerOverlay.xul
 override chrome://about-support/locale/aboutSupportPlatform.dtd chrome://about-support/locale/aboutSupportMac.dtd os=Darwin

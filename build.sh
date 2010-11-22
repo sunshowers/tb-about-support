@@ -38,10 +38,17 @@ ROOT_DIRS=         # ...and these directories       (space separated list)
 BEFORE_BUILD=      # run this before building       (bash command)
 AFTER_BUILD=       # ...and this after the build    (bash command)
 
+# Get the trunk support revision
 if [ -z $1 ]; then
+  echo "Usage: $0 <trunk revision> [config file]"
+  exit 1;
+fi
+TRUNK_REVISION=$1
+
+if [ -z $2 ]; then
   . ./config_build.sh
 else
-  . $1
+  . $2
 fi
 
 if [ -z $APP_NAME ]; then
@@ -88,6 +95,16 @@ for DIR in $ROOT_DIRS; do
   cp --verbose --parents $FILES $TMP_DIR
 done
 
+# Copy the trunk revision into the temp dir. Note that we don't JAR the files
+# up, as recommended for Mozilla 2.0 and above.
+echo "Copying trunk revision to $TMP_DIR/chrome-trunk folder..."
+hg_args=""
+for dir in $CHROME_PROVIDERS; do
+  hg_args="${hg_args} -I $dir"
+done
+
+hg archive -t files -r $TRUNK_REVISION $hg_args $TMP_DIR/chrome-trunk
+
 # Copy other files to the root of future XPI.
 for ROOT_FILE in $ROOT_FILES install.rdf chrome.manifest; do
   cp --verbose $ROOT_FILE $TMP_DIR
@@ -117,8 +134,6 @@ rm -f sed*
 # generate the XPI file...
 echo "Generating $APP_NAME.xpi..."
 zip -r ../$APP_NAME.xpi *
-# and make sure the jar is uncompressed
-zip -0 ../$APP_NAME.xpi chrome/$APP_NAME.jar
 
 cd "$ROOT_DIR"
 
