@@ -127,8 +127,8 @@ if [ -f "chrome.manifest" ]; then
 
   # (it simply adds jar:chrome/whatever.jar!/ at appropriate positions of chrome.manifest)
 
-  # Now concatenate the trunk stuff
-  cat ../chrome-trunk.manifest >> chrome.manifest
+  # Now insert the trunk manifest
+  "$SED4_BIN" -i -r -e '\/#TRUNK_MANIFEST/r ../chrome-trunk.manifest' -e '\/#TRUNK_MANIFEST/d' chrome.manifest
 fi
 
 # For some reason we're getting temp files here, remove them
