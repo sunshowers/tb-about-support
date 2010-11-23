@@ -118,14 +118,17 @@ cd $TMP_DIR
 if [ -f "chrome.manifest" ]; then
   echo "Preprocessing chrome.manifest..."
   # You think this is scary?
-  #s/^(content\s+\S*\s+)(\S*\/)$/\1jar:chrome\/$APP_NAME\.jar!\/\2/
-  #s/^(skin|locale)(\s+\S*\s+\S*\s+)(.*\/)$/\1\2jar:chrome\/$APP_NAME\.jar!\/\3/
+  #s/^(content\s+\S*\s+)(\S*\/)/\1jar:chrome\/$APP_NAME\.jar!\/\2/
+  #s/^(skin|locale)(\s+\S*\s+\S*\s+)(.*\/)/\1\2jar:chrome\/$APP_NAME\.jar!\/\3/
   #
   # Then try this! (Same, but with characters escaped for bash :)
-  "$SED4_BIN" -i -r s/^\(content\\s+\\S*\\s+\)\(\\S*\\/\)$/\\1jar:chrome\\/$APP_NAME\\.jar!\\/\\2/ chrome.manifest
-  "$SED4_BIN" -i -r s/^\(skin\|locale\)\(\\s+\\S*\\s+\\S*\\s+\)\(.*\\/\)$/\\1\\2jar:chrome\\/$APP_NAME\\.jar!\\/\\3/ chrome.manifest
+  "$SED4_BIN" -i -r s/^\(content\\s+\\S*\\s+\)\(\\S*\\/\)/\\1jar:chrome\\/$APP_NAME\\.jar!\\/\\2/ chrome.manifest
+  "$SED4_BIN" -i -r s/^\(skin\|locale\)\(\\s+\\S*\\s+\\S*\\s+\)\(.*\\/\)/\\1\\2jar:chrome\\/$APP_NAME\\.jar!\\/\\3/ chrome.manifest
 
   # (it simply adds jar:chrome/whatever.jar!/ at appropriate positions of chrome.manifest)
+
+  # Now concatenate the trunk stuff
+  cat ../chrome-trunk.manifest >> chrome.manifest
 fi
 
 # For some reason we're getting temp files here, remove them

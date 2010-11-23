@@ -1,0 +1,3 @@
+content about-support chrome-trunk/content/ appversion>=3.3a1pre
+locale about-support en-US chrome-trunk/locales/en-US/ appversion>=3.3a1pre
+skin about-support classic/1.0 chrome-trunk/skin/ appversion>=3.3a1pre
