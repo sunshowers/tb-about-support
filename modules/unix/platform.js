@@ -41,6 +41,10 @@ var EXPORTED_SYMBOLS = ["AboutSupportPlatform"];
 
 // JS ctypes are needed to get at the data we need
 Components.utils.import("resource://gre/modules/ctypes.jsm");
+const GFile = ctypes.StructType("GFile");
+const GFileInfo = ctypes.StructType("GFileInfo");
+const GError = ctypes.StructType("GError");
+const GCancellable = ctypes.StructType("GCancellable");
 
 const G_FILE_ATTRIBUTE_FILESYSTEM_TYPE = "filesystem::type";
 
@@ -58,37 +62,35 @@ var AboutSupportPlatform = {
       let g_filename_from_utf8 = glib.declare(
         "g_filename_from_utf8",
         ctypes.default_abi,
-        ctypes.char.ptr,                // return type: glib locale string
-        ctypes.char.ptr,                // in: utf8string
-        ctypes.ssize_t,                 // in: len
-        ctypes.size_t.ptr,              // out: bytes_read
-        ctypes.size_t.ptr,              // out: bytes_written
-        ctypes.StructType("GError").ptr // out: error
+        ctypes.char.ptr,   // return type: glib locale string
+        ctypes.char.ptr,   // in: utf8string
+        ctypes.ssize_t,    // in: len
+        ctypes.size_t.ptr, // out: bytes_read
+        ctypes.size_t.ptr, // out: bytes_written
+        GError.ptr         // out: error
       );
       let filePath = g_filename_from_utf8(aFile.path, -1, null, null, null);
 
       // Given a path, creates a new GFile for it.
-      let GFile = ctypes.StructType("GFile");
       let g_file_new_for_path = gio.declare(
         "g_file_new_for_path",
         ctypes.default_abi,
-        GFile.ptr, // return type: a newly-allocated GFile
-        ctypes.char.ptr                 // in: path
+        GFile.ptr,      // return type: a newly-allocated GFile
+        ctypes.char.ptr // in: path
       );
       
       let glibFile = g_file_new_for_path(filePath);
 
-      let GFileInfo = ctypes.StructType("GFileInfo").ptr;
       // Given a GFile, queries the given attributes and returns them
       // as a GFileInfo.
       let g_file_query_filesystem_info = gio.declare(
         "g_file_query_filesystem_info",
         ctypes.default_abi,
-        GFileInfo.ptr,                         // return type
-        GFile.ptr,                             // in: file
-        ctypes.char.ptr,                       // in: attributes
-        ctypes.StructType("GCancellable").ptr, // in: cancellable
-        ctypes.StructType("GError").ptr        // out: error
+        GFileInfo.ptr,    // return type
+        GFile.ptr,        // in: file
+        ctypes.char.ptr,  // in: attributes
+        GCancellable.ptr, // in: cancellable
+        GError.ptr        // out: error
       );
       let glibFileInfo = g_file_query_filesystem_info(
         glibFile, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, null, null);
