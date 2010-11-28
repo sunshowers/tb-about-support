@@ -48,11 +48,66 @@ const GCancellable = ctypes.StructType("GCancellable");
 
 const G_FILE_ATTRIBUTE_FILESYSTEM_TYPE = "filesystem::type";
 
+// This is a tremendous abuse of generators, but it works
+function g_free_generator(aPtr) {
+  let glib = ctypes.open("libglib-2.0.so");
+  try {
+    let g_free_fn = glib.declare(
+      "g_free",
+      ctypes.default_abi,
+      ctypes.void,
+      ctypes.voidptr_t
+    );
+    while (true) {
+      g_free_fn(aPtr);
+      aPtr = yield null;
+    }
+  }
+  finally {
+    glib.close();
+  }
+}
+
+var g_free_gen = null;
+function g_free(aPtr) {
+  if (!g_free_gen)
+    g_free_gen = g_free_generator(aPtr);
+  else
+    g_free_gen.send(aPtr);
+}
+
+function g_object_unref_generator(aPtr) {
+  let glib = ctypes.open("libglib-2.0.so");
+  try {
+    let g_object_unref_fn = glib.declare(
+      "g_object_unref",
+      ctypes.default_abi,
+      ctypes.void,
+      ctypes.voidptr_t
+    );
+    while (true) {
+      g_object_unref_fn(aPtr);
+      aPtr = yield null;
+    }
+  }
+  finally {
+    glib.close();
+  }
+}
+
+var g_object_unref_gen = null;
+function g_object_unref(aPtr) {
+  if (!g_object_unref_gen)
+    g_object_unref_gen = g_object_unref_generator(aPtr);
+  else
+    g_object_unref_gen.send(aPtr);
+}
+
 var AboutSupportPlatform = {
   /**
    * Given an nsIFile, gets the file system type. The type is returned as a
    * string. Possible values are "Network", "Local", and in case the file system
-   * isn't identifiable as either network or local, the .
+   * isn't identifiable as either network or local, the file system identifier.
    */
   getFileSystemType: function ASPUnix_getFileSystemType(aFile) {
     let glib = ctypes.open("libglib-2.0.so");
@@ -70,6 +125,10 @@ var AboutSupportPlatform = {
         GError.ptr         // out: error
       );
       let filePath = g_filename_from_utf8(aFile.path, -1, null, null, null);
+      if (filePath.isNull()) {
+        throw new Error("Unable to convert " + aFile.path +
+                        " into GLib encoding");
+      }
 
       // Given a path, creates a new GFile for it.
       let g_file_new_for_path = gio.declare(
@@ -78,7 +137,6 @@ var AboutSupportPlatform = {
         GFile.ptr,      // return type: a newly-allocated GFile
         ctypes.char.ptr // in: path
       );
-      
       let glibFile = g_file_new_for_path(filePath);
 
       // Given a GFile, queries the given attributes and returns them
@@ -95,7 +153,8 @@ var AboutSupportPlatform = {
       let glibFileInfo = g_file_query_filesystem_info(
         glibFile, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, null, null);
       if (glibFileInfo.isNull()) {
-        // XXX handle error
+        g_free(filePath);
+        g_object_unref(glibFile);
       }
 
       let g_file_info_get_attribute_string = gio.declare(
@@ -107,6 +166,9 @@ var AboutSupportPlatform = {
       );
       let fsType = g_file_info_get_attribute_string(
         glibFileInfo, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
+      g_free(filePath);
+      g_object_unref(glibFile);
+      g_object_unref(glibFileInfo);
       return fsType.readString();
     }
     finally {
