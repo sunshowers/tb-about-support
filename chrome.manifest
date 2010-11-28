@@ -1,4 +1,10 @@
 content about-support content/
+resource about-support modules/
+# Default to the UNIXy platform stuff
+resource about-support-platform modules/unix/
+# ... and override for Windows and Mac
+resource about-support-platform modules/win32/ os=WINNT
+resource about-support-platform modules/mac/ os=Darwin
 locale about-support en-US locales/en-US/
 skin about-support classic/1.0 skin/
 overlay chrome://messenger/content/messenger.xul chrome://about-support/content/messengerOverlay.xul
