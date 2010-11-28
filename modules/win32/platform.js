@@ -51,7 +51,7 @@ var AboutSupportPlatform = {
    * Given an nsIFile, gets the file system type. The type is returned as a
    * string. Possible values are "Network" and "Local".
    */
-  getFileSystemType: function ASP_getFileSystemType(aFile) {
+  getFileSystemType: function ASPWin32_getFileSystemType(aFile) {
     let kernel32 = ctypes.open("kernel32.dll");
 
     try {
