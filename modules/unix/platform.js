@@ -112,4 +112,4 @@ var AboutSupportPlatform = {
       gio.close();
     }
   },
-}
+};
