@@ -104,7 +104,7 @@ function g_object_unref(aPtr) {
 var AboutSupportPlatform = {
   /**
    * Given an nsIFile, gets the file system type. The type is returned as a
-   * string. Possible values are "Network" and "Local".
+   * string. Possible values are "Network", "Local" and "Unknown".
    */
   getFileSystemType: function ASPUnix_getFileSystemType(aFile) {
     let glib = ctypes.open("libglib-2.0.so");
@@ -165,8 +165,9 @@ var AboutSupportPlatform = {
       );
       var fsType = g_file_info_get_attribute_string(
         glibFileInfo, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
-
-      if (kNetworkFilesystems.indexOf(fsType.readString()) != -1)
+      if (fsType.isNull())
+        return "Unknown";
+      else if (kNetworkFilesystems.indexOf(fsType.readString()) != -1)
         return "Network";
       else
         return "Local";
