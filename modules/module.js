@@ -39,7 +39,13 @@
 
 var EXPORTED_SYMBOLS = ["AboutSupport"];
 
-Components.utils.import("resource://about-support-platform/platform.js");
+// Platform-specific includes
+if ("@mozilla.org/windows-registry-key;1" in Components.classes)
+  Components.utils.import("resource://about-support/win32.js");
+else if ("nsILocalFileMac" in Components.interfaces)
+  Components.utils.import("resource://about-support/mac.js");
+else
+  Components.utils.import("resource://about-support/unix.js");
 
 var AboutSupport = {
   __proto__: AboutSupportPlatform,
