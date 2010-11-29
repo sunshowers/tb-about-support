@@ -53,6 +53,8 @@ let gMessengerBundle = gStringBundleService.createBundle(
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
                      .getService(Ci.nsISmtpService);
 
+Components.utils.import("resource://about-support/module.js");
+
 /* Node classes. All of these are mutually exclusive. */
 
 // Any nodes marked with this class will be considered part of the UI only,
@@ -134,6 +136,22 @@ window.onload = function () {
       {"href": "#",
        "onclick": "openProfileDirectory(); event.preventDefault();"
       })]);
+
+  let fsType;
+  try {
+    fsType = AboutSupport.getFileSystemType(currProfD);
+  }
+  catch (x) {
+    Components.utils.reportError(x);
+  }
+
+  if (fsType) {
+    let bundle = gStringBundleService.createBundle(
+      "chrome://about-support/locale/aboutSupport.properties");
+    let fsText = bundle.GetStringFromName("fsType." + fsType);
+    document.getElementById("profile-fs-type-box").textContent = fsText;
+  }
+
   let appInfo = Cc["@mozilla.org/xre/app-info;1"]
                   .getService(Ci.nsIXULAppInfo)
                   .QueryInterface(Ci.nsIXULRuntime);
