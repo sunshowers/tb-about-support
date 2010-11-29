@@ -50,7 +50,7 @@ const DRIVE_NETWORK = 4;
 var AboutSupportPlatform = {
   /**
    * Given an nsIFile, gets the file system type. The type is returned as a
-   * string. Possible values are "Network", "Local" and "Unknown".
+   * string. Possible values are "network", "local" and "unknown".
    */
   getFileSystemType: function ASPWin32_getFileSystemType(aFile) {
     let kernel32 = ctypes.open("kernel32.dll");
@@ -95,11 +95,11 @@ var AboutSupportPlatform = {
       let type = GetDriveType(volumePath);
       // http://msdn.microsoft.com/en-us/library/aa364939
       if (type == DRIVE_UNKNOWN)
-        return "Unknown";
+        return "unknown";
       else if (type == DRIVE_NETWORK)
-        return "Network";
+        return "network";
       else
-        return "Local";
+        return "local";
     }
     finally {
       kernel32.close();

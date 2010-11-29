@@ -45,6 +45,8 @@ Components.utils.import("resource:///modules/iteratorUtils.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
 
+Components.utils.import("resource://about-support/module.js");
+
 let gMessengerBundle = Services.strings.createBundle(
   "chrome://messenger/locale/messenger.properties");
 let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
@@ -123,6 +125,22 @@ window.onload = function () {
       {"href": "#",
        "onclick": "openProfileDirectory(); event.preventDefault();"
       })]);
+
+  let fsType;
+  try {
+    fsType = AboutSupport.getFileSystemType(currProfD);
+  }
+  catch (x) {
+    Components.utils.reportError(x);
+  }
+
+  if (fsType) {
+    let bundle = Services.strings.createBundle(
+      "chrome://about-support/locale/aboutSupport.properties");
+    let fsText = bundle.GetStringFromName("fsType." + fsType);
+    document.getElementById("profile-fs-type-box").textContent = fsText;
+  }
+
   document.getElementById("buildid-box").textContent = Services.appinfo.appBuildID;
 
   // Update the other sections.
