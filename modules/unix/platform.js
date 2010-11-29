@@ -48,6 +48,8 @@ const GCancellable = ctypes.StructType("GCancellable");
 
 const G_FILE_ATTRIBUTE_FILESYSTEM_TYPE = "filesystem::type";
 
+const kNetworkFilesystems = ["afs", "cifs", "nfs", "smb"];
+
 // This is a tremendous abuse of generators, but it works
 function g_free_generator() {
   let glib = ctypes.open("libglib-2.0.so");
@@ -102,8 +104,7 @@ function g_object_unref(aPtr) {
 var AboutSupportPlatform = {
   /**
    * Given an nsIFile, gets the file system type. The type is returned as a
-   * string. Possible values are "Network", "Local", and in case the file system
-   * isn't identifiable as either network or local, the file system identifier.
+   * string. Possible values are "Network" and "Local".
    */
   getFileSystemType: function ASPUnix_getFileSystemType(aFile) {
     let glib = ctypes.open("libglib-2.0.so");
@@ -165,7 +166,10 @@ var AboutSupportPlatform = {
       var fsType = g_file_info_get_attribute_string(
         glibFileInfo, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
 
-      return fsType.readString();
+      if (kNetworkFilesystems.indexOf(fsType.readString()) != -1)
+        return "Network";
+      else
+        return "Local";
     }
     finally {
       if (filePath)
