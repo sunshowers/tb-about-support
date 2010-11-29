@@ -77,9 +77,9 @@ function g_free(aPtr) {
 }
 
 function g_object_unref_generator() {
-  let glib = ctypes.open("libglib-2.0.so");
+  let gobject = ctypes.open("libgobject-2.0.so");
   try {
-    let g_object_unref_fn = glib.declare(
+    let g_object_unref_fn = gobject.declare(
       "g_object_unref",
       ctypes.default_abi,
       ctypes.void_t,
@@ -91,7 +91,7 @@ function g_object_unref_generator() {
     }
   }
   finally {
-    glib.close();
+    gobject.close();
   }
 }
 
