@@ -1,3 +1,12 @@
 content about-support chrome-trunk/content/ appversion>=3.3a1pre
+
+resource about-support chrome-trunk/modules/ appversion>=3.3a1pre
+
+# Default to the UNIXy platform stuff
+resource about-support-platform chrome-trunk/modules/unix/ appversion>=3.3a1pre
+# ... and override for Windows and Mac
+resource about-support-platform chrome-trunk/modules/win32/ os=WINNT appversion>=3.3a1pre
+resource about-support-platform chrome-trunk/modules/mac/ os=Darwin appversion>=3.3a1pre
+
 locale about-support en-US chrome-trunk/locales/en-US/ appversion>=3.3a1pre
 skin about-support classic/1.0 chrome-trunk/skin/ appversion>=3.3a1pre
