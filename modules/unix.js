@@ -57,7 +57,7 @@ function g_free_generator() {
     let g_free_fn = glib.declare(
       "g_free",
       ctypes.default_abi,
-      ctypes.void,
+      ctypes.void_t,
       ctypes.voidptr_t
     );
     while (true) {
@@ -82,7 +82,7 @@ function g_object_unref_generator() {
     let g_object_unref_fn = glib.declare(
       "g_object_unref",
       ctypes.default_abi,
-      ctypes.void,
+      ctypes.void_t,
       ctypes.voidptr_t
     );
     while (true) {
