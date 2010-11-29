@@ -159,7 +159,7 @@ var AboutSupportPlatform = {
       let g_file_info_get_attribute_string = gio.declare(
         "g_file_info_get_attribute_string",
         ctypes.default_abi,
-        ctypes.char.ptr, // return type: file system type
+        ctypes.char.ptr, // return type: file system type (do not free)
         GFileInfo.ptr,   // in: info
         ctypes.char.ptr  // in: attribute
       );
@@ -178,8 +178,6 @@ var AboutSupportPlatform = {
         g_object_unref(glibFile);
       if (glibFileInfo && !glibFileInfo.isNull())
         g_object_unref(glibFileInfo);
-      if (fsType)
-        g_free(fsType);
       glib.close();
       gio.close();
     }
