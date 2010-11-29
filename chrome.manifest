@@ -6,6 +6,9 @@ resource about-support modules/ appversion<3.3a1pre
 
 locale about-support en-US locales/en-US/ appversion>=3.1
 skin about-support classic/1.0 skin/ appversion>=3.1
+
+# Trunk overrides
 #TRUNK_MANIFEST
+
 overlay chrome://messenger/content/messenger.xul chrome://about-support/content/messengerOverlay.xul
 override chrome://about-support/locale/aboutSupportPlatform.dtd chrome://about-support/locale/aboutSupportMac.dtd os=Darwin
