@@ -50,56 +50,23 @@ const G_FILE_ATTRIBUTE_FILESYSTEM_TYPE = "filesystem::type";
 
 const kNetworkFilesystems = ["afs", "cifs", "nfs", "smb"];
 
-// This is a tremendous abuse of generators, but it works
-function g_free_generator() {
-  let glib = ctypes.open("libglib-2.0.so");
-  try {
-    let g_free_fn = glib.declare(
-      "g_free",
-      ctypes.default_abi,
-      ctypes.void_t,
-      ctypes.voidptr_t
-    );
-    while (true) {
-      let ptr = yield;
-      g_free_fn(ptr);
-    }
-  }
-  finally {
-    glib.close();
-  }
-}
+// GC is responsible for closing these libraries
+var glib = ctypes.open("libglib-2.0.so");
+var gobject = ctypes.open("libgobject-2.0.so");
 
-var g_free_gen = g_free_generator();
-g_free_gen.next();
-function g_free(aPtr) {
-  g_free_gen.send(aPtr);
-}
+var g_free = glib.declare(
+  "g_free",
+  ctypes.default_abi,
+  ctypes.void_t,
+  ctypes.voidptr_t
+);
 
-function g_object_unref_generator() {
-  let gobject = ctypes.open("libgobject-2.0.so");
-  try {
-    let g_object_unref_fn = gobject.declare(
-      "g_object_unref",
-      ctypes.default_abi,
-      ctypes.void_t,
-      ctypes.voidptr_t
-    );
-    while (true) {
-      let ptr = yield;
-      g_object_unref_fn(ptr);
-    }
-  }
-  finally {
-    gobject.close();
-  }
-}
-
-var g_object_unref_gen = g_object_unref_generator();
-g_object_unref_gen.next();
-function g_object_unref(aPtr) {
-  g_object_unref_gen.send(aPtr);
-}
+var g_object_unref = gobject.declare(
+  "g_object_unref",
+  ctypes.default_abi,
+  ctypes.void_t,
+  ctypes.voidptr_t
+);
 
 var AboutSupportPlatform = {
   /**
@@ -107,7 +74,6 @@ var AboutSupportPlatform = {
    * string. Possible values are "network", "local" and "unknown".
    */
   getFileSystemType: function ASPUnix_getFileSystemType(aFile) {
-    let glib = ctypes.open("libglib-2.0.so");
     let gio = ctypes.open("libgio-2.0.so");
     try {
       // Given a UTF-8 string, converts it to the current Glib locale.
@@ -179,7 +145,6 @@ var AboutSupportPlatform = {
         g_object_unref(glibFile);
       if (glibFileInfo && !glibFileInfo.isNull())
         g_object_unref(glibFileInfo);
-      glib.close();
       gio.close();
     }
   },
