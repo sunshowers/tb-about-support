@@ -1,7 +1,7 @@
 #!/bin/bash
 # Build config for build.sh
 APP_NAME=tb-about-support
-CHROME_PROVIDERS="content locales skin"
+CHROME_PROVIDERS="content locales modules skin"
 CLEAN_UP=1
 ROOT_FILES=
 ROOT_DIRS=
