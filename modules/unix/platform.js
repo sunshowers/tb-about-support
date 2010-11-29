@@ -49,7 +49,7 @@ const GCancellable = ctypes.StructType("GCancellable");
 const G_FILE_ATTRIBUTE_FILESYSTEM_TYPE = "filesystem::type";
 
 // This is a tremendous abuse of generators, but it works
-function g_free_generator(aPtr) {
+function g_free_generator() {
   let glib = ctypes.open("libglib-2.0.so");
   try {
     let g_free_fn = glib.declare(
@@ -59,8 +59,8 @@ function g_free_generator(aPtr) {
       ctypes.voidptr_t
     );
     while (true) {
-      g_free_fn(aPtr);
-      aPtr = yield null;
+      let ptr = yield;
+      g_free_fn(ptr);
     }
   }
   finally {
@@ -68,15 +68,13 @@ function g_free_generator(aPtr) {
   }
 }
 
-var g_free_gen = null;
+var g_free_gen = g_free_generator();
+g_free_gen.next();
 function g_free(aPtr) {
-  if (!g_free_gen)
-    g_free_gen = g_free_generator(aPtr);
-  else
-    g_free_gen.send(aPtr);
+  g_free_gen.send(aPtr);
 }
 
-function g_object_unref_generator(aPtr) {
+function g_object_unref_generator() {
   let glib = ctypes.open("libglib-2.0.so");
   try {
     let g_object_unref_fn = glib.declare(
@@ -86,8 +84,8 @@ function g_object_unref_generator(aPtr) {
       ctypes.voidptr_t
     );
     while (true) {
-      g_object_unref_fn(aPtr);
-      aPtr = yield null;
+      let ptr = yield;
+      g_object_unref_fn(ptr);
     }
   }
   finally {
@@ -95,12 +93,10 @@ function g_object_unref_generator(aPtr) {
   }
 }
 
-var g_object_unref_gen = null;
+var g_object_unref_gen = g_object_unref_generator();
+g_object_unref_gen.next();
 function g_object_unref(aPtr) {
-  if (!g_object_unref_gen)
-    g_object_unref_gen = g_object_unref_generator(aPtr);
-  else
-    g_object_unref_gen.send(aPtr);
+  g_object_unref_gen.send(aPtr);
 }
 
 var AboutSupportPlatform = {
