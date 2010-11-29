@@ -102,6 +102,9 @@ hg_args=""
 for dir in $CHROME_PROVIDERS; do
   hg_args="${hg_args} -I $dir"
 done
+for dir in $ROOT_DIRS; do
+  hg_args="${hg_args} -I $dir"
+done
 
 hg archive -t files -r $TRUNK_REVISION $hg_args $TMP_DIR/chrome-trunk
 

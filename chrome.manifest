@@ -1,4 +1,9 @@
 content about-support content/ appversion>=3.1
+
+# resource directives don't seem to be overridable by later ones, so we need to
+# make the appversion filters disjoint.
+resource about-support modules/ appversion<3.3a1pre
+
 locale about-support en-US locales/en-US/ appversion>=3.1
 skin about-support classic/1.0 skin/ appversion>=3.1
 #TRUNK_MANIFEST
