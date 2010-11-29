@@ -72,13 +72,14 @@ var AboutSupportPlatform = {
         ctypes.uint32_t // return type: the last error
       );
 
+      let filePath = aFile.path;
       // The volume path should be at most 1 greater than than the length of the
       // path -- add 1 for a trailing backslash if necessary, and 1 for the
       // terminating null character. Note that the parentheses around the type are
       // necessary for new to apply correctly.
       let volumePath = new (ctypes.jschar.array(filePath.length + 2));
 
-      if (!GetVolumePathName(aFile.path, volumePath, volumePath.length)) {
+      if (!GetVolumePathName(filePath, volumePath, volumePath.length)) {
         throw new Error("Unable to get volume path for " + filePath + ", error " +
                         GetLastError());
       }
