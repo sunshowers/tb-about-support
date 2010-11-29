@@ -53,20 +53,6 @@ const voidptr_t = ctypes.uint32_t;
 // and this, too
 const size_t = ctypes.uint32_t;
 
-var mozcrt = ctypes.open("mozcrt19.dll");
-var malloc = mozcrt.declare(
-  "malloc",
-  ctypes.default_abi,
-  voidptr_t, // return type: a pointer to the newly-allocated memory
-  size_t     // in: size
-);
-var free = mozcrt.declare(
-  "free",
-  ctypes.default_abi,
-  ctypes.void_t, // return type
-  voidptr_t      // in: ptr
-);
-
 var AboutSupportPlatform = {
   /**
    * Given an nsIFile, gets the file system type. The type is returned as a
@@ -133,3 +119,28 @@ var AboutSupportPlatform = {
     }
   },
 };
+
+var mozcrt;
+try {
+  mozcrt = ctypes.open("mozcrt19.dll");
+} catch (x) {
+  // We don't have a malloc(), so we can't actually do anything.
+  AboutSupportPlatform.getFileSystemType = function (aFile) {
+    return null;
+  };
+}
+
+if (mozcrt) {
+  var malloc = mozcrt.declare(
+    "malloc",
+    ctypes.default_abi,
+    voidptr_t, // return type: a pointer to the newly-allocated memory
+    size_t     // in: size
+  );
+  var free = mozcrt.declare(
+    "free",
+    ctypes.default_abi,
+    ctypes.void_t, // return type
+    voidptr_t      // in: ptr
+  );
+}
