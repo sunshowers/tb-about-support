@@ -168,13 +168,13 @@ var AboutSupportPlatform = {
       return fsType.readString();
     }
     finally {
-      if (filePath && !filePath.isNull())
+      if (filePath)
         g_free(filePath);
       if (glibFile && !glibFile.isNull())
         g_object_unref(glibFile);
       if (glibFileInfo && !glibFileInfo.isNull())
         g_object_unref(glibFileInfo);
-      if (fsType && !fsType.isNull())
+      if (fsType)
         g_free(fsType);
       glib.close();
       gio.close();
