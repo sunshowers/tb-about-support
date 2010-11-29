@@ -120,7 +120,10 @@ var AboutSupportPlatform = {
         ctypes.size_t.ptr, // out: bytes_written
         GError.ptr         // out: error
       );
-      let filePath = g_filename_from_utf8(aFile.path, -1, null, null, null);
+      // Yes, we want function scoping for variables we need to free in the
+      // finally block. I think this is better than declaring lots of variables
+      // on top.
+      var filePath = g_filename_from_utf8(aFile.path, -1, null, null, null);
       if (filePath.isNull()) {
         throw new Error("Unable to convert " + aFile.path +
                         " into GLib encoding");
@@ -133,7 +136,7 @@ var AboutSupportPlatform = {
         GFile.ptr,      // return type: a newly-allocated GFile
         ctypes.char.ptr // in: path
       );
-      let glibFile = g_file_new_for_path(filePath);
+      var glibFile = g_file_new_for_path(filePath);
 
       // Given a GFile, queries the given attributes and returns them
       // as a GFileInfo.
@@ -146,11 +149,10 @@ var AboutSupportPlatform = {
         GCancellable.ptr, // in: cancellable
         GError.ptr        // out: error
       );
-      let glibFileInfo = g_file_query_filesystem_info(
+      var glibFileInfo = g_file_query_filesystem_info(
         glibFile, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE, null, null);
       if (glibFileInfo.isNull()) {
-        g_free(filePath);
-        g_object_unref(glibFile);
+        throw new Error("Unabled to retrieve GLib file info for " + aFile.path);
       }
 
       let g_file_info_get_attribute_string = gio.declare(
@@ -160,14 +162,20 @@ var AboutSupportPlatform = {
         GFileInfo.ptr,   // in: info
         ctypes.char.ptr  // in: attribute
       );
-      let fsType = g_file_info_get_attribute_string(
+      var fsType = g_file_info_get_attribute_string(
         glibFileInfo, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
-      g_free(filePath);
-      g_object_unref(glibFile);
-      g_object_unref(glibFileInfo);
+
       return fsType.readString();
     }
     finally {
+      if (filePath && !filePath.isNull())
+        g_free(filePath);
+      if (glibFile && !glibFile.isNull())
+        g_object_unref(glibFile);
+      if (glibFileInfo && !glibFileInfo.isNull())
+        g_object_unref(glibFileInfo);
+      if (fsType && !fsType.isNull())
+        g_free(fsType);
       glib.close();
       gio.close();
     }
