@@ -129,7 +129,7 @@ var AboutSupportPlatform = {
         GFileInfo.ptr,   // in: info
         ctypes.char.ptr  // in: attribute
       );
-      var fsType = g_file_info_get_attribute_string(
+      let fsType = g_file_info_get_attribute_string(
         glibFileInfo, G_FILE_ATTRIBUTE_FILESYSTEM_TYPE);
       if (fsType.isNull())
         return "unknown";
