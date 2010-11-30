@@ -45,6 +45,7 @@ var AboutSupportPlatform = {
    * string. Possible values are "network", "local" and "unknown".
    */
   getFileSystemType: function ASPWin32_getFileSystemType(aFile) {
-    throw new Error("Not implemented");
+    // Not implemented
+    return null;
   },
 };
