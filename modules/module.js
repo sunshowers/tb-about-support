@@ -89,10 +89,10 @@ var AboutSupport = {
     for (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
       let server = account.incomingServer;
       accountDetails[account.key] = {
+        // This makes generation a little more convenient
+        key: account.key,
         name: server.prettyName,
-        type: server.type,
-        hostName: server.hostName,
-        port: server.port,
+        hostDetails: "(" + server.type + ") " + server.hostName + ":" + server.port,
         socketType: server.socketType,
         authMethod: server.authMethod,
         smtpServers: this._getSMTPDetails(account),
