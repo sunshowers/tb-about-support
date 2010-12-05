@@ -39,6 +39,9 @@
 
 var EXPORTED_SYMBOLS = ["AboutSupport"];
 
+const Cc = Components.classes;
+const Ci = Components.interfaces;
+
 // Platform-specific includes
 if ("@mozilla.org/windows-registry-key;1" in Components.classes)
   Components.utils.import("resource://about-support/win32.js");
@@ -48,6 +51,9 @@ else
   Components.utils.import("resource://about-support/unix.js");
 
 Components.utils.import("resource:///modules/iteratorUtils.jsm");
+
+var gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
+                     .getService(Ci.nsISmtpService);
 
 var AboutSupport = {
   __proto__: AboutSupportPlatform,
