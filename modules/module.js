@@ -77,7 +77,8 @@ var AboutSupport = {
   },
 
   /**
-   * Returns account details as a dictionary, keyed by the account ID.
+   * Returns account details as a dictionary of records, keyed by the account
+   * ID.
    */
   getAccountDetails: function AboutSupport_getAccountDetails() {
     let accountDetails = {};
@@ -85,7 +86,7 @@ var AboutSupport = {
                            .getService(Ci.nsIMsgAccountManager);
     let accounts = accountManager.accounts;
 
-    for each (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
+    for (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
       let server = account.incomingServer;
       accountDetails[account.key] = {
         name: server.prettyName,
@@ -94,7 +95,7 @@ var AboutSupport = {
         port: server.port,
         socketType: server.socketType,
         authMethod: server.authMethod,
-        smtpServers: this._getSMTPDetails(account)
+        smtpServers: this._getSMTPDetails(account),
       };
     }
 
