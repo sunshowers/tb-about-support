@@ -47,6 +47,57 @@ else if ("nsILocalFileMac" in Components.interfaces)
 else
   Components.utils.import("resource://about-support/unix.js");
 
+Components.utils.import("resource:///modules/iteratorUtils.jsm");
+
 var AboutSupport = {
   __proto__: AboutSupportPlatform,
+
+  /**
+   * Gets details about SMTP servers for a given nsIMsgAccount.
+   *
+   * @returns A list of records, each record containing the name and other details
+   *          about one SMTP server.
+   */
+  _getSMTPDetails: function AboutSupport__getSMTPDetails(aAccount) {
+    let identities = aAccount.identities;
+    let defaultIdentity = aAccount.defaultIdentity;
+    let smtpDetails = [];
+
+    for each (let identity in fixIterator(identities, Ci.nsIMsgIdentity)) {
+      let isDefault = identity == defaultIdentity;
+      let smtpServer = {};
+      gSMTPService.GetSmtpServerByIdentity(identity, smtpServer);
+      smtpDetails.push({name: smtpServer.value.displayname,
+                        authMethod: smtpServer.value.authMethod,
+                        socketType: smtpServer.value.socketType,
+                        isDefault: isDefault});
+    }
+
+    return smtpDetails;
+  },
+
+  /**
+   * Returns account details as a dictionary, keyed by the account ID.
+   */
+  getAccountDetails: function AboutSupport_getAccountDetails() {
+    let accountDetails = {};
+    let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
+                           .getService(Ci.nsIMsgAccountManager);
+    let accounts = accountManager.accounts;
+
+    for each (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
+      let server = account.incomingServer;
+      accountDetails[account.key] = {
+        name: server.prettyName,
+        type: server.type,
+        hostName: server.hostName,
+        port: server.port,
+        socketType: server.socketType,
+        authMethod: server.authMethod,
+        smtpServers: this._getSMTPDetails(account)
+      };
+    }
+
+    return accountDetails;
+  }
 };
