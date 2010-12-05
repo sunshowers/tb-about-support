@@ -83,18 +83,17 @@ var AboutSupport = {
   },
 
   /**
-   * Returns account details as a dictionary of records, keyed by the account
-   * ID.
+   * Returns account details as a list of records.
    */
   getAccountDetails: function AboutSupport_getAccountDetails() {
-    let accountDetails = {};
+    let accountDetails = [];
     let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
                            .getService(Ci.nsIMsgAccountManager);
     let accounts = accountManager.accounts;
 
     for (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
       let server = account.incomingServer;
-      accountDetails[account.key] = {
+      accountDetails.push({
         // This makes generation a little more convenient
         key: account.key,
         name: server.prettyName,
@@ -102,7 +101,7 @@ var AboutSupport = {
         socketType: server.socketType,
         authMethod: server.authMethod,
         smtpServers: this._getSMTPDetails(account),
-      };
+      });
     }
 
     return accountDetails;
