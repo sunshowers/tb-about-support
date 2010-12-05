@@ -50,9 +50,6 @@ let gStringBundleService = Cc["@mozilla.org/intl/stringbundle;1"]
 let gMessengerBundle = gStringBundleService.createBundle(
   "chrome://messenger/locale/messenger.properties");
 
-let gSMTPService = Cc["@mozilla.org/messengercompose/smtp;1"]
-                     .getService(Ci.nsISmtpService);
-
 Components.utils.import("resource://about-support/module.js");
 
 /* Node classes. All of these are mutually exclusive. */
@@ -179,30 +176,6 @@ function populateExtensionsSection() {
   appendChildren(document.getElementById("extensions-tbody"), trExtensions);
 }
 
-/**
- * Gets details about SMTP servers for a given nsIMsgAccount.
- *
- * @returns A list of records, each record containing the name and other details
- *          about one SMTP server.
- */
-function getSMTPDetails(aAccount) {
-  let identities = aAccount.identities;
-  let defaultIdentity = aAccount.defaultIdentity;
-  let smtpDetails = [];
-
-  for each (let identity in fixIterator(identities, Ci.nsIMsgIdentity)) {
-    let isDefault = identity == defaultIdentity;
-    let smtpServer = {};
-    gSMTPService.GetSmtpServerByIdentity(identity, smtpServer);
-    smtpDetails.push({name: smtpServer.value.displayname,
-                      authMethod: smtpServer.value.authMethod,
-                      socketType: smtpServer.value.socketType,
-                      isDefault: isDefault});
-  }
-
-  return smtpDetails;
-}
-
 // Invert nsMsgSocketType and nsMsgAuthMethod so that we can present something
 // slightly more descriptive than a mere number. JS really should have object
 // comprehensions :(
@@ -222,7 +195,7 @@ function getSocketTypeText(aIndex) {
     // The string wasn't found in the bundle. Make do without it.
     prettySocketType = plainSocketType;
   }
-  return [prettySocketType, plainSocketType];
+  return {localized: prettySocketType, neutral: plainSocketType};
 }
 
 let gAuthMethods = {};
@@ -250,55 +223,88 @@ function getAuthMethodText(aIndex) {
   else {
     prettyAuthMethod = plainAuthMethod;
   }
-  return [prettyAuthMethod, plainAuthMethod];
+  return {localized: prettyAuthMethod, neutral: plainAuthMethod};
 }
 
+/**
+ * Coerces x into a string.
+ */
+function toStr(x) {
+  return "" + x;
+}
+
+/**
+ * Marks x as private (see below).
+ */
+function toPrivate(x) {
+  return {localized: x, neutral: x, isPrivate: true};
+}
+
+/**
+ * A list of fields for the incoming server of an account. Each element of the
+ * list is a pair of [property name, transforming function]. The transforming
+ * function should take the property and return either a string or an object
+ * with the following properties:
+ * - localized: the data in (possibly) localized form
+ * - neutral: the data in language-neutral form
+ * - isPrivate (optional): true if the data is private-only, false if public-only,
+ *                         not stated otherwise
+ */
+var gIncomingDetails = [
+  ["key", toStr],
+  ["name", toPrivate],
+  ["hostDetails", toStr],
+  ["socketType", getSocketTypeText],
+  ["authMethod", getAuthMethodText],
+];
+
+/**
+ * A list of fields for the outgoing servers associated with an account. This is
+ * similar to gIncomingDetails above.
+ */
+var gOutgoingDetails = [
+  ["name", toStr],
+  ["socketType", getSocketTypeText],
+  ["authMethod", getAuthMethodText],
+  ["isDefault", toStr],
+];
+
 function populateAccountsSection() {
-  let accountManager = Cc["@mozilla.org/messenger/account-manager;1"]
-                         .getService(Ci.nsIMsgAccountManager);
-
-  let accounts = accountManager.accounts;
   let trAccounts = [];
+  let accountDetails = AboutSupport.getAccountDetails();
 
-  for each (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
-    let server = account.incomingServer;
-    let smtpDetails = getSMTPDetails(account);
-    let smtpMarkup = [];
-    for each ([, smtpServer] in Iterator(smtpDetails)) {
-      let [prettySocketType, plainSocketType] = getSocketTypeText(
-        smtpServer.socketType);
-      let [prettyAuthMethod, plainAuthMethod] = getAuthMethodText(
-        smtpServer.authMethod);
-      smtpMarkup.push([createElement("td", smtpServer.name),
-                       createElement("td", prettySocketType, null, plainSocketType),
-                       createElement("td", prettyAuthMethod, null, plainAuthMethod),
-                       createElement("td", smtpServer.isDefault)]);
-    }
+  function createTD(data, rowspan) {
+    let text = (typeof data == "string") ? data : data.localized;
+    let copyData = (typeof data == "string") ? null : data.neutral;
+    let attributes = {rowspan: rowspan};
+    if (typeof data == "object" && "isPrivate" in data)
+      attributes.class = data.isPrivate ? CLASS_DATA_PRIVATE : CLASS_DATA_PUBLIC;
 
-    // smtpMarkup might not be configured, in which case add one dummy element
-    // to it to appease the HTML gods below.
-    if (smtpMarkup.length == 0)
-      smtpMarkup = [[]];
+    return createElement("td", text, attributes, copyData);
+  }
 
-    let [prettySocketType, plainSocketType] = getSocketTypeText(server.socketType);
-    let [prettyAuthMethod, plainAuthMethod] = getAuthMethodText(server.authMethod);
+  for (let [, account] in Iterator(accountDetails)) {
+    // We want a minimum rowspan of 1
+    let rowspan = account.smtpServers.length || 1;
+    let incomingProps = gIncomingDetails.map(function ([prop, fn]) fn(account[prop]));
+    let outgoingProps = account.smtpServers.map(
+      function (smtp) gOutgoingDetails.map(function ([prop, fn]) fn(smtp[prop])));
+
+    // incomingTDs is a list of TDs
+    let incomingTDs = incomingProps.map(function (data) createTD(data, rowspan));
+    // outgoingTDs is a list of list of TDs
+    let outgoingTDs = outgoingProps.map(
+      function (props) props.map(function (data) createTD(data, 1)));
+
+    // If there are no SMTP servers, add a dummy element to make life easier below
+    if (outgoingTDs.length == 0)
+      outgoingTDs = [[]];
 
     // Add the first SMTP server to this tr.
-    let tr = createParentElement("tr", [
-      createElement("td", account.key, {"rowspan": smtpMarkup.length}),
-      // The server name can contain the email address, so it is private
-      createElement("td", server.prettyName, {"rowspan": smtpMarkup.length,
-                                              "class": CLASS_DATA_PRIVATE}),
-      createElement("td", "(" + server.type + ") " + server.hostName + ":" +
-                    server.port, {"rowspan": smtpMarkup.length}),
-      createElement("td", prettySocketType,
-                    {"rowspan": smtpMarkup.length}, plainSocketType),
-      createElement("td", prettyAuthMethod,
-                    {"rowspan": smtpMarkup.length}, plainAuthMethod),
-    ].concat(smtpMarkup[0]));
+    let tr = createParentElement("tr", incomingTDs.concat(outgoingTDs[0]));
     trAccounts.push(tr);
     // Add the remaining SMTP servers as separate trs
-    for each (let [, tds] in Iterator(smtpMarkup.slice(1)))
+    for each (let [, tds] in Iterator(outgoingTDs.slice(1)))
       trAccounts.push(createParentElement("tr", tds));
   }
 
