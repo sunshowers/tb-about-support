@@ -44,8 +44,10 @@ const Ci = Components.interfaces;
 Components.utils.import("resource:///modules/iteratorUtils.jsm");
 Components.utils.import("resource://gre/modules/AddonManager.jsm");
 Components.utils.import("resource://gre/modules/Services.jsm");
+Components.utils.import("resource://gre/modules/XPCOMUtils.jsm");
 
 Components.utils.import("resource://about-support/module.js");
+
 
 let gMessengerBundle = Services.strings.createBundle(
   "chrome://messenger/locale/messenger.properties");
@@ -258,9 +260,15 @@ var gOutgoingDetails = [
   ["isDefault", toStr],
 ];
 
+
+/**
+ * A list of account details.
+ */
+XPCOMUtils.defineLazyGetter(this, "gAccountDetails",
+                            function () AboutSupport.getAccountDetails());
+
 function populateAccountsSection() {
   let trAccounts = [];
-  let accountDetails = AboutSupport.getAccountDetails();
 
   function createTD(data, rowspan) {
     let text = (typeof data == "string") ? data : data.localized;
@@ -272,7 +280,7 @@ function populateAccountsSection() {
     return createElement("td", text, attributes, copyData);
   }
 
-  for (let [, account] in Iterator(accountDetails)) {
+  for (let [, account] in Iterator(gAccountDetails)) {
     // We want a minimum rowspan of 1
     let rowspan = account.smtpServers.length || 1;
     let incomingProps = gIncomingDetails.map(function ([prop, fn]) fn(account[prop]));
