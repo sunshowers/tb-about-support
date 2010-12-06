@@ -94,7 +94,6 @@ var AboutSupport = {
     for (let account in fixIterator(accounts, Ci.nsIMsgAccount)) {
       let server = account.incomingServer;
       accountDetails.push({
-        // This makes generation a little more convenient
         key: account.key,
         name: server.prettyName,
         hostDetails: "(" + server.type + ") " + server.hostName + ":" + server.port,
