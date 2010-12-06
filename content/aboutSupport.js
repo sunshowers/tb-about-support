@@ -279,10 +279,10 @@ XPCOMUtils.defineLazyGetter(window, "gAccountDetails",
 function populateAccountsSection() {
   let trAccounts = [];
 
-  function createTD(data, rowspan) {
+  function createTD(data, rowSpan) {
     let text = (typeof data == "string") ? data : data.localized;
     let copyData = (typeof data == "string") ? null : data.neutral;
-    let attributes = {rowspan: rowspan};
+    let attributes = {rowspan: rowSpan};
     if (typeof data == "object" && "isPrivate" in data)
       attributes.class = data.isPrivate ? CLASS_DATA_PRIVATE : CLASS_DATA_PUBLIC;
 
