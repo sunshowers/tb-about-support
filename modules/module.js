@@ -103,6 +103,30 @@ var AboutSupport = {
       });
     }
 
+    function idCompare(accountA, accountB) {
+      let regex = /^account([0-9]+)$/;
+      let regexA = regex.exec(accountA.key);
+      let regexB = regex.exec(accountB.key);
+      // There's an off chance that the account ID isn't in the standard
+      // accountN form. If so, use the standard string compare against a fixed
+      // string ("account") to avoid correctness issues.
+      if (!regexA || !regexB) {
+        let keyA = regexA ? "account" : accountA.key;
+        let keyB = regexB ? "account" : accountB.key;
+        return keyA.localeCompare(keyB);
+      }
+      let idA = parseInt(regexA[1]);
+      let idB = parseInt(regexB[1]);
+      if (idA > idB)
+        return 1;
+      else if (idA < idB)
+        return -1;
+      else
+        return 0;
+    }
+
+    // Sort accountDetails by account ID.
+    accountDetails.sort(idCompare);
     return accountDetails;
   }
 };
