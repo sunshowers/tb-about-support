@@ -260,7 +260,6 @@ var gOutgoingDetails = [
   ["isDefault", toStr],
 ];
 
-
 /**
  * A list of account details.
  */
@@ -306,6 +305,39 @@ function populateAccountsSection() {
   }
 
   appendChildren(document.getElementById("accounts-tbody"), trAccounts);
+}
+
+/**
+ * Returns a plaintext representation of the accounts data.
+ */
+function getAccountText(aHidePrivateData, aIndent) {
+  let accumulator = [];
+
+  // Given a string or object, converts it into a language-neutral form 
+  function neutralizer(data) {
+    if (typeof data == "string")
+      return data;
+    if ("isPrivate" in data && (aHidePrivateData == data.isPrivate))
+      return "";
+    return data.neutral;
+  }
+
+  for (let [, account] in Iterator(gAccountDetails)) {
+    accumulator.push(aIndent + account.key + ":");
+    let incomingData = [neutralizer(fn(account[prop]))
+                        for ([, [prop, fn]] in Iterator(gIncomingDetails))];
+    accumulator.push(aIndent + "  INCOMING: " + incomingData.join(", "));
+
+    let outgoingData = [[neutralizer(fn(smtp[prop]))
+                         for ([, [prop, fn]] in Iterator(gOutgoingDetails))]
+                        for ([, smtp] in Iterator(account.smtpServers))];
+    for (let [, data] in Iterator(outgoingData))
+      accumulator.push(aIndent + "  OUTGOING: " + data.join(", "));
+
+    accumulator.push("");
+  }
+
+  return accumulator.join("\n");
 }
 
 function populatePreferencesSection() {
@@ -433,7 +465,7 @@ function copyToClipboard() {
   let hidePrivateData = !document.getElementById("check-show-private-data").checked;
   let contentsDiv = createCleanedUpContents(hidePrivateData);
   let dataHtml = contentsDiv.innerHTML;
-  let dataText = createTextForElement(contentsDiv);
+  let dataText = createTextForElement(contentsDiv, hidePrivateData);
 
   // We can't use plain strings, we have to use nsSupportsString.
   let supportsStringClass = Cc["@mozilla.org/supports-string;1"];
@@ -543,10 +575,10 @@ function cleanUpText(aElem, aHidePrivateData) {
 
 // Return the plain text representation of an element.  Do a little bit
 // of pretty-printing to make it human-readable.
-function createTextForElement(elem) {
+function createTextForElement(elem, aHidePrivateData) {
   // Generate the initial text.
   let textFragmentAccumulator = [];
-  generateTextForElement(elem, "", textFragmentAccumulator);
+  generateTextForElement(elem, aHidePrivateData, "", textFragmentAccumulator);
   let text = textFragmentAccumulator.join("");
 
   // Trim extraneous whitespace before newlines, then squash extraneous
@@ -561,10 +593,26 @@ function createTextForElement(elem) {
   return text;
 }
 
-function generateTextForElement(elem, indent, textFragmentAccumulator) {
+/**
+ * Elements to replace entirely with custom text. Keys are element ids, values
+ * are functions that return the text.
+ */
+var gElementsToReplace = {
+  "accounts-table": getAccountText,
+};
+
+function generateTextForElement(elem, aHidePrivateData, indent,
+                                textFragmentAccumulator) {
   // Add a little extra spacing around most elements.
   if (["td", "th", "span", "a"].indexOf(elem.tagName) == -1)
     textFragmentAccumulator.push("\n");
+
+  // If this element is one of our elements to replace with text, do it.
+  if (elem.id in gElementsToReplace) {
+    let replaceFn = gElementsToReplace[elem.id];
+    textFragmentAccumulator.push(replaceFn(aHidePrivateData, indent));
+    return;
+  };
 
   let childCount = elem.childElementCount;
 
@@ -587,7 +635,8 @@ function generateTextForElement(elem, indent, textFragmentAccumulator) {
     else if (node.nodeType == Node.ELEMENT_NODE) {
       // Recurse on the child element with an extra level of indentation (but
       // only if there's more than one child).
-      generateTextForElement(node, indent + (childCount > 1 ? "  " : ""),
+      generateTextForElement(node, aHidePrivateData,
+                             indent + (childCount > 1 ? "  " : ""),
                              textFragmentAccumulator);
     }
     // Advance!
