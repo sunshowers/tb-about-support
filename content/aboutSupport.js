@@ -150,21 +150,40 @@ window.onload = function () {
   populateGraphicsSection();
 }
 
+/**
+ * A list of extensions. This is assigned to by populateExtensionsSection.
+ */
+var gExtensions;
+
+/**
+ * A list of fields for each extension.
+ */
+var gExtensionDetails = ["name", "version", "isActive", "id"];
+
 function populateExtensionsSection() {
   AddonManager.getAddonsByTypes(["extension"], function (extensions) {
+    gExtensions = extensions;
     let trExtensions = [];
     for (let i = 0; i < extensions.length; i++) {
       let extension = extensions[i];
-      let tr = createParentElement("tr", [
-        createElement("td", extension.name),
-        createElement("td", extension.version),
-        createElement("td", extension.isActive),
-        createElement("td", extension.id),
-      ]);
+      let extensionTDs = [createElement("td", extension[prop])
+                          for ([, prop] in Iterator(gExtensionDetails))];
+      let tr = createParentElement("tr", extensionTDs);
       trExtensions.push(tr);
     }
     appendChildren(document.getElementById("extensions-tbody"), trExtensions);
   });
+}
+
+/**
+ * Returns a plaintext representation of extension data.
+ */
+function getExtensionsText(aHidePrivateData, aIndent) {
+  let extensionData = [aIndent +
+                       [extension[prop]
+                        for ([, prop] in Iterator(gExtensionDetails))].join(", ")
+                       for ([, extension] in Iterator(gExtensions))];
+  return extensionData.join("\n");
 }
 
 // Invert nsMsgSocketType and nsMsgAuthMethod so that we can present something
@@ -263,7 +282,7 @@ var gOutgoingDetails = [
 /**
  * A list of account details.
  */
-XPCOMUtils.defineLazyGetter(this, "gAccountDetails",
+XPCOMUtils.defineLazyGetter(window, "gAccountDetails",
                             function () AboutSupport.getAccountDetails());
 
 function populateAccountsSection() {
@@ -599,6 +618,7 @@ function createTextForElement(elem, aHidePrivateData) {
  */
 var gElementsToReplace = {
   "accounts-table": getAccountText,
+  "extensions-table": getExtensionsText,
 };
 
 function generateTextForElement(elem, aHidePrivateData, indent,
