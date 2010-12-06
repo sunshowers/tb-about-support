@@ -610,7 +610,7 @@ function generateTextForElement(elem, aHidePrivateData, indent,
   // If this element is one of our elements to replace with text, do it.
   if (elem.id in gElementsToReplace) {
     let replaceFn = gElementsToReplace[elem.id];
-    textFragmentAccumulator.push(replaceFn(aHidePrivateData, indent));
+    textFragmentAccumulator.push(replaceFn(aHidePrivateData, indent + "  "));
     return;
   };
 
