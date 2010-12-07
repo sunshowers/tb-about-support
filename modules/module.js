@@ -96,7 +96,8 @@ var AboutSupport = {
       accountDetails.push({
         key: account.key,
         name: server.prettyName,
-        hostDetails: "(" + server.type + ") " + server.hostName + ":" + server.port,
+        hostDetails: "(" + server.type + ") " + server.hostName +
+                     (server.port != -1 ? (":" + server.port) : ""),
         socketType: server.socketType,
         authMethod: server.authMethod,
         smtpServers: this._getSMTPDetails(account),
