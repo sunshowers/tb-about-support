@@ -36,8 +36,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-"use strict";
-
 const Cc = Components.classes;
 const Ci = Components.interfaces;
 
