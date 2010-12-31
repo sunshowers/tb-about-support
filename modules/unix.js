@@ -35,8 +35,6 @@
  * 
  * ***** END LICENSE BLOCK ***** */
 
-"use strict";
-
 var EXPORTED_SYMBOLS = ["AboutSupportPlatform"];
 
 var AboutSupportPlatform = {
