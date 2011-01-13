@@ -10,5 +10,6 @@ skin about-support classic/1.0 skin/ appversion>=3.1
 # Trunk overrides
 #TRUNK_MANIFEST
 
-overlay chrome://messenger/content/messenger.xul chrome://about-support/content/messengerOverlay.xul
+# 3.3a2 and above include this extension
+overlay chrome://messenger/content/messenger.xul chrome://about-support/content/messengerOverlay.xul appversion<3.3a2
 override chrome://about-support/locale/aboutSupportPlatform.dtd chrome://about-support/locale/aboutSupportMac.dtd os=Darwin
